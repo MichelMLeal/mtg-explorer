@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.env.local
+*.tsbuildinfo
+coverage/
+.vitest/
+pnpm-lock.yaml

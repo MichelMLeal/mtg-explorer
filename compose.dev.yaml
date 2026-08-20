@@ -1,0 +1,55 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./packages/shared/src:/app/packages/shared/src
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=debug
+    command: pnpm --filter @mtg-explorer/api dev
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - mtg-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: builder
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+      - ./packages/shared/src:/app/packages/shared/src
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BASE=/
+      - VITE_API_URL=http://localhost:3000
+    command: pnpm --filter @mtg-explorer/web dev --host
+    networks:
+      - mtg-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - mtg-network
+
+networks:
+  mtg-network:
+    driver: bridge

@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.*
+*.md
+coverage
+.vitest
+dist
+pnpm-lock.yaml
+.github
+docs

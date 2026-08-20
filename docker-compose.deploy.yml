@@ -1,0 +1,49 @@
+services:
+  api:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-owner}/mtg-explorer-api:${RELEASE_SHA}
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - mtg-network
+    restart: unless-stopped
+
+  web:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-owner}/mtg-explorer-web:${RELEASE_SHA}
+    ports:
+      - "127.0.0.1:3001:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - mtg-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - mtg-redis-data:/data
+    networks:
+      - mtg-network
+    restart: unless-stopped
+
+volumes:
+  mtg-redis-data:
+
+networks:
+  mtg-network:
+    driver: bridge

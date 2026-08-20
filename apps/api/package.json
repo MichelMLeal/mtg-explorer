@@ -1,0 +1,38 @@
+{
+  "name": "@mtg-explorer/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/app.js",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx watch src/app.ts",
+    "start": "node dist/app.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@mtg-explorer/shared": "workspace:*",
+    "fastify": "^4.28.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/rate-limit": "^9.0.0",
+    "@fastify/helmet": "^12.0.0",
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^4.1.0",
+    "ioredis": "^5.4.0",
+    "zod": "^3.23.0",
+    "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "fastify": "^4.28.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "eslint": "^9.0.0"
+  }
+}

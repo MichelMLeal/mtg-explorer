@@ -1,0 +1,16 @@
+{
+  apps:
+    mtg.tail800040.ts.net {
+      reverse_proxy /api/* 127.0.0.1:3000
+      reverse_proxy /* 127.0.0.1:3001
+
+      header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy strict-origin-when-cross-origin
+      }
+
+      encode gzip
+    }
+}

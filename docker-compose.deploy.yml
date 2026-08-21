@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-owner}/mtg-explorer-api:${RELEASE_SHA}
+    image: ghcr.io/${OWNER_LC:-owner}/mtg-explorer-api:${RELEASE_SHA}
     ports:
       - "127.0.0.1:3000:3000"
     environment:
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   web:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-owner}/mtg-explorer-web:${RELEASE_SHA}
+    image: ghcr.io/${OWNER_LC:-owner}/mtg-explorer-web:${RELEASE_SHA}
     ports:
       - "127.0.0.1:3001:8080"
     depends_on:

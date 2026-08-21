@@ -1,6 +1,7 @@
 {
   "name": "mtg-explorer",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@9.6.0",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
@@ -12,7 +13,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
   },
   "devDependencies": {
+    "@eslint/js": "^9",
+    "eslint": "^9",
     "prettier": "^3.3.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8"
   }
 }

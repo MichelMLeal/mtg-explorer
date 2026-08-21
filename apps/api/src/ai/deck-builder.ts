@@ -85,6 +85,8 @@ function calculateManaCurve(cards: DeckCard[], allCards: Map<string, MtgCard>): 
   for (const deckCard of cards) {
     const card = allCards.get(deckCard.cardId);
     if (!card) continue;
+    // ponytail: lands have no mana cost, exclude from curve (shown as deck total instead)
+    if (card.typeLine.includes('Land')) continue;
     const slot = card.cmc >= 6 ? '6+' : String(Math.floor(card.cmc)) as keyof ManaCurve;
     curve[slot] += deckCard.quantity;
   }
@@ -114,7 +116,6 @@ export async function buildDeck(params: {
     getColorQuery(colors),
     getFormatQuery(format),
     't:creature',
-    ...strategy.priorities.filter((p) => p.startsWith('t:')),
     'order:edhrec',
   ].join(' ');
 

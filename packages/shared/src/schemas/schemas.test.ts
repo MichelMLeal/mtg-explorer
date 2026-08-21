@@ -3,10 +3,8 @@ import {
   CardSearchSchema,
   CardParamsSchema,
   DeckBuildSchema,
-  DeckValidateSchema,
   PaginationSchema,
 } from './index.js';
-import { MTG_COLORS, FORMATS, DECK_STYLES } from '../types/index.js';
 
 describe('CardSearchSchema', () => {
   it('accepts valid search params', () => {

@@ -5,4 +5,3 @@ dist/
 *.tsbuildinfo
 coverage/
 .vitest/
-pnpm-lock.yaml

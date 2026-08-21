@@ -27,7 +27,7 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
   // ── GET /api/cards/random — Random card ─────────────────
   app.get('/api/cards/random', async (_request, reply) => {
     const card = await scryfall.getRandomCard();
-    return reply.send(card);
+    return reply.send({ data: card });
   });
 
   // ── GET /api/cards/:id — Card by Scryfall ID ────────────

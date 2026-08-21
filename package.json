@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
-    "test": "pnpm -r test",
-    "test:coverage": "pnpm -r test:coverage",
+    "test": "pnpm --filter @mtg-explorer/shared build && pnpm -r test",
+    "test:coverage": "pnpm --filter @mtg-explorer/shared build && pnpm -r test:coverage",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm --filter @mtg-explorer/shared build && pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
   },
   "devDependencies": {

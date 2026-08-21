@@ -6,6 +6,5 @@ node_modules
 coverage
 .vitest
 dist
-pnpm-lock.yaml
 .github
 docs

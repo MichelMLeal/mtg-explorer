@@ -14,7 +14,7 @@ COPY packages/shared/ packages/shared/
 COPY apps/web/ apps/web/
 
 RUN pnpm --filter @mtg-explorer/shared build
-RUN VITE_BASE=/mtg/ pnpm --filter @mtg-explorer/web build
+RUN pnpm --filter @mtg-explorer/web build
 
 # ── Production Stage ──────────────────────────────────────
 FROM nginx:alpine AS production
@@ -22,11 +22,11 @@ FROM nginx:alpine AS production
 RUN addgroup -g 1001 -S web && adduser -S web -u 1001 -G web
 
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/web/nginx.conf /etc/nginx/nginx.conf
 
 USER web
 
-EXPOSE 80
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD wget -qO- http://localhost:80/ || exit 1
+  CMD wget -qO- http://localhost:8080/ || exit 1

@@ -25,7 +25,8 @@ const LEGALITY_COLORS: Record<LegalityStatus, string> = {
 export default function CardDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: card, isLoading, error } = useCard(id || '');
+  const { data, isLoading, error } = useCard(id || '');
+  const card = data?.data;
 
   if (isLoading) {
     return (

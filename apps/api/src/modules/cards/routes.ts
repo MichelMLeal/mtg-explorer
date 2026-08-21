@@ -37,7 +37,7 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
 
     const card = await scryfall.getCardById(parsed.data.id);
     if (!card) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Card not found' } });
-    return reply.send(card);
+    return reply.send({ data: card });
   });
 
   // ── GET /api/cards/name/:name — Card by name ────────────
@@ -47,7 +47,7 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
 
     const card = await scryfall.getCardByName(parsed.data.name);
     if (!card) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Card not found' } });
-    return reply.send(card);
+    return reply.send({ data: card });
   });
 
   // ── GET /api/cards/arena/:arenaId — Card by Arena ID ─────
@@ -57,6 +57,6 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
 
     const card = await scryfall.getCardByArenaId(parsed.data.arenaId);
     if (!card) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Card not found' } });
-    return reply.send(card);
+    return reply.send({ data: card });
   });
 }

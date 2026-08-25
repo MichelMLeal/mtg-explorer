@@ -12,6 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
   build-and-push:
@@ -107,8 +108,13 @@ jobs:
           RELEASE_SHA: ${{ steps.vars.outputs.sha }}
           OWNER_LC: ${{ steps.vars.outputs.owner_lc }}
         run: |
-          docker compose -f docker-compose.deploy.yml pull
-          docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+          echo "PWD: $(pwd)"
+          echo "Workspace files: $(ls -a)"
+          COMPOSE_FILE=$(find "$GITHUB_WORKSPACE" -maxdepth 3 -name docker-compose.deploy.yml | head -n1)
+          echo "Using compose file: $COMPOSE_FILE"
+          [ -z "$COMPOSE_FILE" ] && echo "ERROR: docker-compose.deploy.yml not found under $GITHUB_WORKSPACE" && exit 1
+          docker compose -f "$COMPOSE_FILE" pull
+          docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
 
       - name: Health check
         run: |
@@ -137,6 +143,7 @@ jobs:
             exit 1
           fi
           export RELEASE_SHA=$PREV_SHA
-          docker compose -f docker-compose.deploy.yml pull
-          docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+          COMPOSE_FILE=$(find "$GITHUB_WORKSPACE" -maxdepth 3 -name docker-compose.deploy.yml | head -n1)
+          docker compose -f "$COMPOSE_FILE" pull
+          docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
           echo "Rolled back to $PREV_SHA"

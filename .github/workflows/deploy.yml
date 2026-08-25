@@ -116,8 +116,10 @@ jobs:
           docker compose -f "$COMPOSE_FILE" down
           docker ps -q --filter "publish=3000" | xargs -r docker rm -f || true
           docker ps -q --filter "publish=3001" | xargs -r docker rm -f || true
-          sudo fuser -k 3000/tcp 2>/dev/null || fuser -k 3000/tcp 2>/dev/null || true
-          sudo fuser -k 3001/tcp 2>/dev/null || fuser -k 3001/tcp 2>/dev/null || true
+          for p in 3000 3001; do
+            pid=$(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n1)
+            [ -n "$pid" ] && sudo kill -9 "$pid" 2>/dev/null || true
+          done
           docker compose -f "$COMPOSE_FILE" pull
           docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
 
@@ -152,8 +154,10 @@ jobs:
           docker compose -f "$COMPOSE_FILE" down
           docker ps -q --filter "publish=3000" | xargs -r docker rm -f || true
           docker ps -q --filter "publish=3001" | xargs -r docker rm -f || true
-          sudo fuser -k 3000/tcp 2>/dev/null || fuser -k 3000/tcp 2>/dev/null || true
-          sudo fuser -k 3001/tcp 2>/dev/null || fuser -k 3001/tcp 2>/dev/null || true
+          for p in 3000 3001; do
+            pid=$(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n1)
+            [ -n "$pid" ] && sudo kill -9 "$pid" 2>/dev/null || true
+          done
           docker compose -f "$COMPOSE_FILE" pull
           docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
           echo "Rolled back to $PREV_SHA"

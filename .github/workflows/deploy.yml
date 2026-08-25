@@ -117,9 +117,13 @@ jobs:
           docker ps -q --filter "publish=3000/tcp" | xargs -r docker rm -f || true
           docker ps -q --filter "publish=3001/tcp" | xargs -r docker rm -f || true
           for p in 3000 3001; do
-            pid=$(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n1)
-            [ -n "$pid" ] && sudo kill -9 "$pid" 2>/dev/null || true
+            for pid in $(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | sort -u); do
+              ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+              sudo kill -9 "$pid" 2>/dev/null || true
+              [ -n "$ppid" ] && [ "$ppid" != "1" ] && sudo kill -9 "$ppid" 2>/dev/null || true
+            done
           done
+          sleep 1
           docker compose -f "$COMPOSE_FILE" pull
           docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
 
@@ -155,9 +159,13 @@ jobs:
           docker ps -q --filter "publish=3000/tcp" | xargs -r docker rm -f || true
           docker ps -q --filter "publish=3001/tcp" | xargs -r docker rm -f || true
           for p in 3000 3001; do
-            pid=$(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n1)
-            [ -n "$pid" ] && sudo kill -9 "$pid" 2>/dev/null || true
+            for pid in $(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | sort -u); do
+              ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+              sudo kill -9 "$pid" 2>/dev/null || true
+              [ -n "$ppid" ] && [ "$ppid" != "1" ] && sudo kill -9 "$ppid" 2>/dev/null || true
+            done
           done
+          sleep 1
           docker compose -f "$COMPOSE_FILE" pull
           docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
           echo "Rolled back to $PREV_SHA"

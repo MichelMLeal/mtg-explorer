@@ -85,4 +85,4 @@ See `.env.example` and `.env.production.example`.
 
 ## License
 
-MIT.
+MIT!

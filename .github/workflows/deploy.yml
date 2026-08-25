@@ -114,8 +114,8 @@ jobs:
           echo "Using compose file: $COMPOSE_FILE"
           [ -z "$COMPOSE_FILE" ] && echo "ERROR: docker-compose.deploy.yml not found under $GITHUB_WORKSPACE" && exit 1
           docker compose -f "$COMPOSE_FILE" down
-          docker ps -q --filter "publish=3000" | xargs -r docker rm -f || true
-          docker ps -q --filter "publish=3001" | xargs -r docker rm -f || true
+          docker ps -q --filter "publish=3000/tcp" | xargs -r docker rm -f || true
+          docker ps -q --filter "publish=3001/tcp" | xargs -r docker rm -f || true
           for p in 3000 3001; do
             pid=$(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n1)
             [ -n "$pid" ] && sudo kill -9 "$pid" 2>/dev/null || true
@@ -152,8 +152,8 @@ jobs:
           export RELEASE_SHA=$PREV_SHA
           COMPOSE_FILE=$(find "$GITHUB_WORKSPACE" -maxdepth 3 -name docker-compose.deploy.yml | head -n1)
           docker compose -f "$COMPOSE_FILE" down
-          docker ps -q --filter "publish=3000" | xargs -r docker rm -f || true
-          docker ps -q --filter "publish=3001" | xargs -r docker rm -f || true
+          docker ps -q --filter "publish=3000/tcp" | xargs -r docker rm -f || true
+          docker ps -q --filter "publish=3001/tcp" | xargs -r docker rm -f || true
           for p in 3000 3001; do
             pid=$(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -n1)
             [ -n "$pid" ] && sudo kill -9 "$pid" 2>/dev/null || true

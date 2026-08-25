@@ -114,9 +114,9 @@ jobs:
           echo "Using compose file: $COMPOSE_FILE"
           [ -z "$COMPOSE_FILE" ] && echo "ERROR: docker-compose.deploy.yml not found under $GITHUB_WORKSPACE" && exit 1
           docker compose -f "$COMPOSE_FILE" down
-          docker ps -q --filter "publish=3000/tcp" | xargs -r docker rm -f || true
+          docker ps -q --filter "publish=3010/tcp" | xargs -r docker rm -f || true
           docker ps -q --filter "publish=3001/tcp" | xargs -r docker rm -f || true
-          for p in 3000 3001; do
+          for p in 3010 3001; do
             for pid in $(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | sort -u); do
               ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
               sudo kill -9 "$pid" 2>/dev/null || true
@@ -130,7 +130,7 @@ jobs:
       - name: Health check
         run: |
           for i in $(seq 1 12); do
-            if curl -sf http://127.0.0.1:3000/health > /dev/null 2>&1; then
+            if curl -sf http://127.0.0.1:3010/health > /dev/null 2>&1; then
               echo "API is healthy"
               exit 0
             fi
@@ -156,9 +156,9 @@ jobs:
           export RELEASE_SHA=$PREV_SHA
           COMPOSE_FILE=$(find "$GITHUB_WORKSPACE" -maxdepth 3 -name docker-compose.deploy.yml | head -n1)
           docker compose -f "$COMPOSE_FILE" down
-          docker ps -q --filter "publish=3000/tcp" | xargs -r docker rm -f || true
+          docker ps -q --filter "publish=3010/tcp" | xargs -r docker rm -f || true
           docker ps -q --filter "publish=3001/tcp" | xargs -r docker rm -f || true
-          for p in 3000 3001; do
+          for p in 3010 3001; do
             for pid in $(sudo ss -ltnp "sport = :$p" 2>/dev/null | grep -oP 'pid=\K[0-9]+' | sort -u); do
               ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
               sudo kill -9 "$pid" 2>/dev/null || true

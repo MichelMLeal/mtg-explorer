@@ -82,9 +82,6 @@ jobs:
     runs-on: self-hosted
     needs: build-and-push
     environment: production
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }} 
     steps:
       - uses: actions/checkout@v4
 

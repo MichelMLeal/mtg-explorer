@@ -107,13 +107,14 @@ export default function CardDetailPage() {
             )}
           </div>
 
-          {card.prices?.usd && (
+          {(card.prices?.usd || card.prices?.usdFoil || card.prices?.eur || card.prices?.eurFoil || card.prices?.tix) && (
             <div className="card-detail-prices">
               <h3>Prices</h3>
               <div className="price-grid">
                 {card.prices.usd && <div>USD: ${card.prices.usd}</div>}
                 {card.prices.usdFoil && <div>USD Foil: ${card.prices.usdFoil}</div>}
                 {card.prices.eur && <div>EUR: €{card.prices.eur}</div>}
+                {card.prices.eurFoil && <div>EUR Foil: €{card.prices.eurFoil}</div>}
                 {card.prices.tix && <div>Tix: {card.prices.tix}</div>}
               </div>
             </div>

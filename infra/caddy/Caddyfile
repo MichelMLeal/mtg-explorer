@@ -1,7 +1,7 @@
 {
   apps:
     mtg.tail800040.ts.net {
-      reverse_proxy /api/* 127.0.0.1:3000
+      reverse_proxy /api/* 127.0.0.1:3010
       reverse_proxy /* 127.0.0.1:3001
 
       header {

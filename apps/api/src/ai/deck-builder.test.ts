@@ -1,6 +1,47 @@
-import { describe, it, expect } from 'vitest';
-import { validateDeck } from './deck-builder.js';
-import type { Deck } from '@mtg-explorer/shared';
+import { describe, it, expect, vi } from 'vitest';
+import type { Deck, MtgCard } from '@mtg-explorer/shared';
+
+function makeCard(overrides: Partial<MtgCard> & { id: string; name: string }): MtgCard {
+  return {
+    oracleId: overrides.id,
+    manaCost: '{1}',
+    cmc: 1,
+    typeLine: 'Creature — Test',
+    oracleText: '',
+    colors: [],
+    colorIdentity: [],
+    keywords: [],
+    setCode: 'tst',
+    setName: 'Test Set',
+    rarity: 'common',
+    imageUris: { small: '', normal: '', large: '', png: '' } as MtgCard['imageUris'],
+    prices: {},
+    legalities: {} as MtgCard['legalities'],
+    artist: 'Test',
+    pricesAvailable: false,
+    ...overrides,
+  };
+}
+
+vi.mock('../integrations/scryfall/index.js', () => ({
+  searchCards: vi.fn(async (query: string) => {
+    let pool: MtgCard[];
+    if (query.includes('t:creature')) {
+      pool = Array.from({ length: 40 }, (_, i) => makeCard({ id: `creature-${i}`, name: `Creature ${i}` }));
+    } else if (query.includes('t:land')) {
+      pool = Array.from({ length: 30 }, (_, i) =>
+        makeCard({ id: `land-${i}`, name: `Land ${i}`, typeLine: 'Land' })
+      );
+    } else {
+      pool = Array.from({ length: 40 }, (_, i) =>
+        makeCard({ id: `spell-${i}`, name: `Spell ${i}`, typeLine: 'Instant' })
+      );
+    }
+    return { data: pool, totalCards: pool.length, hasMore: false };
+  }),
+}));
+
+const { buildDeck, validateDeck } = await import('./deck-builder.js');
 
 function makeDeck(overrides: Partial<Deck> = {}): Deck {
   return {
@@ -92,5 +133,21 @@ describe('validateDeck', () => {
     const result = validateDeck(deck, 'unknown' as any);
     expect(result.valid).toBe(false);
     expect(result.errors.some((e) => e.includes('Unknown format'))).toBe(true);
+  });
+});
+
+describe('buildDeck', () => {
+  it('builds a commander deck that passes its own singleton validation', async () => {
+    const deck = await buildDeck({ colors: ['G'], format: 'commander', style: 'fun' });
+    expect(deck.cards.every((c) => c.quantity === 1)).toBe(true);
+
+    const result = validateDeck(deck, 'commander');
+    expect(result.errors.some((e) => e.includes('singleton'))).toBe(false);
+  });
+
+  it('builds a legal-size standard deck', async () => {
+    const deck = await buildDeck({ colors: ['R', 'W'], format: 'standard', style: 'fun' });
+    const result = validateDeck(deck, 'standard');
+    expect(result.errors.some((e) => e.includes('must have'))).toBe(false);
   });
 });

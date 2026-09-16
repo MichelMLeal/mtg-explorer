@@ -1,34 +1,31 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCardSearch, useRandomCard } from '../hooks/useCards';
 import SearchBar from '../components/SearchBar';
 import CardGrid from '../components/CardGrid';
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') ?? '';
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useCardSearch(searchQuery, page);
   const randomCard = useRandomCard();
 
-  const handleSearch = useCallback((q: string) => {
-    setSearchQuery(q);
-    setPage(1);
-  }, []);
+  const handleSearch = useCallback(
+    (q: string) => {
+      setSearchParams(q ? { q } : {});
+      setPage(1);
+    },
+    [setSearchParams]
+  );
 
   const handleRandom = () => {
     if (randomCard.data) {
       navigate(`/card/${randomCard.data.id}`);
     }
   };
-
-  // Extract query from URL on mount
-  const params = new URLSearchParams(window.location.search);
-  const urlQuery = params.get('q');
-  if (urlQuery && urlQuery !== searchQuery) {
-    handleSearch(urlQuery);
-  }
 
   return (
     <div className="search-page">
@@ -39,7 +36,7 @@ export default function SearchPage() {
         </p>
       </div>
 
-      <SearchBar />
+      <SearchBar value={searchQuery} onSearch={handleSearch} />
 
       <div className="search-actions">
         <button className="btn btn-secondary" onClick={handleRandom} disabled={randomCard.isLoading}>

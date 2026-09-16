@@ -137,7 +137,10 @@ jobs:
             echo "Waiting for API... ($i/12)"
             sleep 5
           done
-          echo "API health check failed"
+          echo "API health check failed, dumping container state and logs:"
+          COMPOSE_FILE=$(find "$GITHUB_WORKSPACE" -maxdepth 3 -name docker-compose.deploy.yml | head -n1)
+          docker compose -f "$COMPOSE_FILE" ps
+          docker compose -f "$COMPOSE_FILE" logs --tail=200
           exit 1
 
       - name: Record release

@@ -121,13 +121,14 @@ export async function buildDeck(params: {
 
   const creatureResult = await searchCards(creatureQuery, 1, 40);
   const creatureCount = Math.floor(rules.min * strategy.creatureRatio);
+  const isSingleton = format === 'commander';
 
   let added = 0;
   for (const card of creatureResult.data) {
     if (added >= creatureCount) break;
     if (budget && card.prices.usd && parseFloat(card.prices.usd) > budget * 0.1) continue;
 
-    const qty = card.rarity === 'mythic' || card.rarity === 'rare' ? 1 : 2;
+    const qty = isSingleton || card.rarity === 'mythic' || card.rarity === 'rare' ? 1 : 2;
     if (added + qty > creatureCount) continue;
 
     deckCards.push({ cardId: card.id, cardName: card.name, quantity: qty, isSideboard: false });
@@ -152,7 +153,7 @@ export async function buildDeck(params: {
     if (deckCards.some((d) => d.cardId === card.id)) continue;
     if (budget && card.prices.usd && parseFloat(card.prices.usd) > budget * 0.15) continue;
 
-    const qty = card.rarity === 'mythic' || card.rarity === 'rare' ? 1 : 2;
+    const qty = isSingleton || card.rarity === 'mythic' || card.rarity === 'rare' ? 1 : 2;
     if (added + qty > spellCount) continue;
 
     deckCards.push({ cardId: card.id, cardName: card.name, quantity: qty, isSideboard: false });
@@ -175,7 +176,9 @@ export async function buildDeck(params: {
     if (added >= landCount) break;
     if (deckCards.some((d) => d.cardId === card.id)) continue;
 
-    const qty = card.name.includes('Dual') || card.name.includes('Fetch') ? 1 : 2;
+    // Commander's singleton rule (as enforced by validateDeck below) applies to
+    // lands too, so cap every land at 1 copy when building for that format.
+    const qty = isSingleton ? 1 : card.name.includes('Dual') || card.name.includes('Fetch') ? 1 : 2;
     if (added + qty > landCount) continue;
 
     deckCards.push({ cardId: card.id, cardName: card.name, quantity: qty, isSideboard: false });

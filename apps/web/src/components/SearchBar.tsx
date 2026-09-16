@@ -1,15 +1,20 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-export default function SearchBar() {
-  const [query, setQuery] = useState('');
-  const navigate = useNavigate();
+interface SearchBarProps {
+  value: string;
+  onSearch: (query: string) => void;
+}
+
+export default function SearchBar({ value, onSearch }: SearchBarProps) {
+  const [query, setQuery] = useState(value);
+
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      navigate(`/?q=${encodeURIComponent(query.trim())}`);
-    }
+    onSearch(query.trim());
   };
 
   return (

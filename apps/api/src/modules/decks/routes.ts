@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { DeckBuildSchema } from '@mtg-explorer/shared';
+import { DeckBuildSchema, DeckValidateSchema } from '@mtg-explorer/shared';
 import { buildDeck, validateDeck } from '../../ai/deck-builder.js';
 import { ZodError } from 'zod';
 
@@ -25,34 +25,37 @@ export async function deckRoutes(app: FastifyInstance): Promise<void> {
 
   // ── POST /api/deck/validate — Validate a deck ────────────
   app.post('/api/deck/validate', async (request, reply) => {
-    const body = request.body as { format?: string; cards?: string[] };
+    const parsed = DeckValidateSchema.safeParse(request.body);
+    if (!parsed.success) return reply.status(400).send(formatZodError(parsed.error));
 
-    if (!body?.format || !body?.cards) {
-      return reply.status(400).send({
-        error: { code: 'VALIDATION_ERROR', message: 'format and cards are required' },
-      });
+    const { format, cards } = parsed.data;
+
+    // Aggregate duplicate card names into a single quantity so the >4-copies
+    // and Commander singleton checks in validateDeck() actually fire.
+    const quantities = new Map<string, number>();
+    for (const name of cards) {
+      quantities.set(name, (quantities.get(name) || 0) + 1);
     }
 
-    // Build a temporary deck object for validation
     const deck = {
       id: 'temp',
       name: 'Validation',
-      format: body.format as any,
+      format: format as any,
       style: 'fun' as const,
       colorIdentity: [] as any[],
-      cards: body.cards.map((name) => ({
+      cards: Array.from(quantities.entries()).map(([cardName, quantity]) => ({
         cardId: 'temp',
-        cardName: name,
-        quantity: 1,
+        cardName,
+        quantity,
         isSideboard: false,
       })),
-      totalCards: body.cards.length,
+      totalCards: cards.length,
       estimatedPrice: 0,
       manaCurve: { '0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6+': 0 },
       createdAt: new Date().toISOString(),
     };
 
-    const result = validateDeck(deck, body.format as any);
+    const result = validateDeck(deck, format as any);
     return reply.send(result);
   });
 }

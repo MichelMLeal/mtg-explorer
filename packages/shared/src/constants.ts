@@ -16,7 +16,10 @@ export const CACHE_KEYS = {
   RANDOM_CARD: (seed: string) => `mtg:card:random:${seed}`,
   DECK_BUILD: (hash: string) => `mtg:deck:${hash}`,
   FORMATS: 'mtg:formats',
-  TOP_DECKS: (format: string) => `mtg:topdecks:${format}`,
+  // Bump this version segment whenever the cached shape changes (e.g. adding
+  // imageUri) so a stale 6h-old entry from before the change can't linger -
+  // a new key is just a cache miss, no manual flush needed after deploy.
+  TOP_DECKS: (format: string) => `mtg:topdecks:v2:${format}`,
 } as const;
 
 // ── Cache TTLs (seconds) ────────────────────────────────────

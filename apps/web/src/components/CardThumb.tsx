@@ -9,12 +9,15 @@ export default function CardThumb({ src, alt }: CardThumbProps) {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      onLoad={() => setLoaded(true)}
-      className={`deck-card-thumb ${loaded ? 'thumb-loaded' : ''}`}
-    />
+    <span className="card-thumb-wrapper">
+      {!loaded && <span className="card-thumb-spinner" />}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        className={`deck-card-thumb ${loaded ? 'thumb-loaded' : ''}`}
+      />
+    </span>
   );
 }

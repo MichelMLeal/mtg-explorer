@@ -41,38 +41,46 @@ describe('getTopDecks', () => {
   it('drops standings with no decklist and ranks the rest by wins, then win rate', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => ({
-        ok: true,
-        json: async () => [
-          mockTournament('Event A', [
-            { name: 'No Deck Player', wins: 5, losses: 0, draws: 0, deckObj: null },
-            {
-              name: 'Fewer Wins',
-              wins: 3,
-              losses: 0,
-              draws: 0,
-              deckObj: { Mainboard: { 'Lightning Bolt': { count: 4 } } },
-            },
-            {
-              name: 'Best Record',
-              wins: 5,
-              losses: 0,
-              draws: 0,
-              deckObj: {
-                Mainboard: { 'Ragavan, Nimble Pilferer': { count: 4 } },
-                Sideboard: { Pyroblast: { count: 2 } },
+      vi.fn(async (url: string) => {
+        // getTopDecks also batch-fetches card images from Scryfall for the
+        // decks it returns - stub that call too, empty is fine here since
+        // these assertions don't touch imageUri.
+        if (url.includes('scryfall.com')) {
+          return { ok: true, json: async () => ({ data: [] }) };
+        }
+        return {
+          ok: true,
+          json: async () => [
+            mockTournament('Event A', [
+              { name: 'No Deck Player', wins: 5, losses: 0, draws: 0, deckObj: null },
+              {
+                name: 'Fewer Wins',
+                wins: 3,
+                losses: 0,
+                draws: 0,
+                deckObj: { Mainboard: { 'Lightning Bolt': { count: 4 } } },
               },
-            },
-            {
-              name: 'Same Wins Worse Rate',
-              wins: 5,
-              losses: 2,
-              draws: 0,
-              deckObj: { Mainboard: { Counterspell: { count: 4 } } },
-            },
-          ]),
-        ],
-      })),
+              {
+                name: 'Best Record',
+                wins: 5,
+                losses: 0,
+                draws: 0,
+                deckObj: {
+                  Mainboard: { 'Ragavan, Nimble Pilferer': { count: 4 } },
+                  Sideboard: { Pyroblast: { count: 2 } },
+                },
+              },
+              {
+                name: 'Same Wins Worse Rate',
+                wins: 5,
+                losses: 2,
+                draws: 0,
+                deckObj: { Mainboard: { Counterspell: { count: 4 } } },
+              },
+            ]),
+          ],
+        };
+      }),
     );
 
     const result = await getTopDecks('modern');

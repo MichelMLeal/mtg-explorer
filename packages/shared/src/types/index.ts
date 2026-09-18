@@ -150,6 +150,7 @@ export interface DeckBuildRequest {
 export interface DeckCardEntry {
   name: string;
   count: number;
+  imageUri?: string;
 }
 
 export interface TopDeckEntry {

@@ -1,5 +1,5 @@
 import type { MtgCard, MtgSet, MtgColor, MtgFormat, MtgRarity } from '@mtg-explorer/shared';
-import { scryfallGet } from '../../infrastructure/http/index.js';
+import { scryfallGet, scryfallPost } from '../../infrastructure/http/index.js';
 import { cacheGet, cacheSet } from '../../infrastructure/cache/index.js';
 import { CACHE_KEYS, CACHE_TTL } from '@mtg-explorer/shared';
 
@@ -305,4 +305,26 @@ export async function getCardPrints(oracleId: string): Promise<MtgCard[]> {
   const prints = result.data.map(mapCard);
   await cacheSet(cacheKey, prints, CACHE_TTL.CARD_PRINTS);
   return prints;
+}
+
+// Batch card-image lookup by name, for decklists (e.g. Top Decks) that only
+// carry card names/counts, no ids. Scryfall's /cards/collection takes up to
+// 75 identifiers per call and only returns what's found - unmatched names
+// (typos, split-card naming mismatches) are simply left out of the map.
+export async function getCardImagesByNames(names: string[]): Promise<Map<string, string>> {
+  const unique = [...new Set(names)];
+  const images = new Map<string, string>();
+
+  for (let i = 0; i < unique.length; i += 75) {
+    const chunk = unique.slice(i, i + 75);
+    const result = await scryfallPost<{ data: ScryfallCard[] }>('/cards/collection', {
+      identifiers: chunk.map((name) => ({ name })),
+    });
+    for (const card of result.data) {
+      const mapped = mapCard(card);
+      if (mapped.imageUris?.normal) images.set(card.name.toLowerCase(), mapped.imageUris.normal);
+    }
+  }
+
+  return images;
 }

@@ -9,6 +9,23 @@ function formatRecord(wins: number, losses: number, draws: number): string {
   return draws > 0 ? `${wins}-${losses}-${draws}` : `${wins}-${losses}`;
 }
 
+function DeckCardRow({ card }: { card: { name: string; count: number; imageUri?: string } }) {
+  return (
+    <div className="deck-card-item">
+      {card.imageUri && (
+        <img src={card.imageUri} alt={card.name} className="deck-card-thumb" loading="lazy" />
+      )}
+      <span className="deck-card-qty">{card.count}x</span>
+      <span className="deck-card-name">{card.name}</span>
+      {card.imageUri && (
+        <div className="card-hover-preview">
+          <img src={card.imageUri} alt={card.name} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TopDecksPage() {
   const [format, setFormat] = useState<MtgFormat>('commander');
   const { data, isLoading, error } = useTopDecks(format);
@@ -68,10 +85,7 @@ export default function TopDecksPage() {
               <h3>Mainboard</h3>
               <div className="deck-cards">
                 {deck.mainboard.map((card: any) => (
-                  <div key={card.name} className="deck-card-item">
-                    <span className="deck-card-qty">{card.count}x</span>
-                    <span className="deck-card-name">{card.name}</span>
-                  </div>
+                  <DeckCardRow key={card.name} card={card} />
                 ))}
               </div>
               {deck.sideboard.length > 0 && (
@@ -79,10 +93,7 @@ export default function TopDecksPage() {
                   <h3>Sideboard</h3>
                   <div className="deck-cards">
                     {deck.sideboard.map((card: any) => (
-                      <div key={card.name} className="deck-card-item">
-                        <span className="deck-card-qty">{card.count}x</span>
-                        <span className="deck-card-name">{card.name}</span>
-                      </div>
+                      <DeckCardRow key={card.name} card={card} />
                     ))}
                   </div>
                 </>

@@ -154,6 +154,11 @@ export default function DeckBuilderPage() {
                   ) : null}
                   <span className="deck-card-qty">{card.quantity}x</span>
                   <span className="deck-card-name">{card.cardName}</span>
+                  {card.imageUri && (
+                    <div className="card-hover-preview">
+                      <img src={card.imageUri} alt={card.cardName} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

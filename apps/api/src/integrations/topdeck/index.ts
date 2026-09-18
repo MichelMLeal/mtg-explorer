@@ -3,6 +3,7 @@ import { CACHE_KEYS, CACHE_TTL, TOPDECK_FORMATS } from '@mtg-explorer/shared';
 import { getEnv } from '../../config/env.js';
 import { cacheGet, cacheSet } from '../../infrastructure/cache/index.js';
 import { createScopedLogger } from '../../infrastructure/logging/index.js';
+import { getCardImagesByNames } from '../scryfall/index.js';
 
 const log = createScopedLogger('topdeck');
 const TOPDECK_API_BASE = 'https://topdeck.gg/api';
@@ -113,6 +114,18 @@ export async function getTopDecks(format: string, limit = 10): Promise<TopDeckEn
   });
 
   const top = entries.slice(0, limit);
+
+  // Only image the decks we're actually returning, not every standing we
+  // fetched - keeps this to a handful of /cards/collection calls.
+  const allNames = top.flatMap((d) => [...d.mainboard, ...d.sideboard].map((c) => c.name));
+  const images = await getCardImagesByNames(allNames);
+  for (const deck of top) {
+    for (const card of [...deck.mainboard, ...deck.sideboard]) {
+      const image = images.get(card.name.toLowerCase());
+      if (image) card.imageUri = image;
+    }
+  }
+
   await cacheSet(cacheKey, top, CACHE_TTL.TOP_DECKS);
   return top;
 }

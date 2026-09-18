@@ -155,7 +155,7 @@ async function buildOneDeck(
       cardName: card.name,
       quantity: qty,
       isSideboard: false,
-      imageUri: card.imageUris?.small,
+      imageUri: card.imageUris?.normal,
     });
     allCards.set(card.id, card);
     added += qty;
@@ -187,7 +187,7 @@ async function buildOneDeck(
       cardName: card.name,
       quantity: qty,
       isSideboard: false,
-      imageUri: card.imageUris?.small,
+      imageUri: card.imageUris?.normal,
     });
     allCards.set(card.id, card);
     added += qty;
@@ -219,7 +219,7 @@ async function buildOneDeck(
       cardName: card.name,
       quantity: qty,
       isSideboard: false,
-      imageUri: card.imageUris?.small,
+      imageUri: card.imageUris?.normal,
     });
     allCards.set(card.id, card);
     added += qty;
@@ -249,7 +249,7 @@ async function buildOneDeck(
         cardName: card.name,
         quantity: 1,
         isSideboard: false,
-        imageUri: card.imageUris?.small,
+        imageUri: card.imageUris?.normal,
       });
       allCards.set(card.id, card);
       added += 1;

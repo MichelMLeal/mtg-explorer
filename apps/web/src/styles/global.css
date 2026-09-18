@@ -530,12 +530,18 @@ a:hover { color: var(--accent-hover); }
   gap: var(--space-xs);
 }
 .deck-card-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   background: var(--bg-card);
+}
+.deck-card-item:hover { z-index: 20; }
+.deck-card-item:hover .card-hover-preview {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
 }
 .deck-card-qty { color: var(--accent); font-weight: 600; min-width: 30px; }
 .deck-card-thumb {

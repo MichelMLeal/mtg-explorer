@@ -85,6 +85,7 @@ export interface ManaCurve {
 export interface DeckCardEntry {
   name: string;
   count: number;
+  imageUri?: string;
 }
 
 export interface TopDeckEntry {

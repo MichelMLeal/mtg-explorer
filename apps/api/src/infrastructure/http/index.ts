@@ -54,6 +54,41 @@ export async function httpGet<T>(url: string, options: RequestOptions = {}): Pro
   }
 }
 
+// Ponytail: same shape as httpGet, only used for Scryfall's /cards/collection
+// batch lookup so far - not merged into httpGet to keep that one's signature
+// simple for its many GET-only callers.
+export async function httpPost<T>(url: string, body: unknown, options: RequestOptions = {}): Promise<T> {
+  const { timeout = 10_000 } = options;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'User-Agent': 'MTGExplorer/1.0',
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => '');
+      const error: HttpError = new Error(`HTTP ${response.status}: ${errorBody}`);
+      error.status = response.status;
+      throw error;
+    }
+
+    return (await response.json()) as T;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // Scryfall-specific rate limiter (10 req/s)
 let lastRequestTime = 0;
 const MIN_INTERVAL_MS = 100; // 10 req/s = 100ms between requests
@@ -84,4 +119,13 @@ export async function scryfallGet<T>(path: string): Promise<T> {
   await reserveSlot();
 
   return httpGet<T>(url, { timeout: 15_000 });
+}
+
+export async function scryfallPost<T>(path: string, body: unknown): Promise<T> {
+  const env = getEnv();
+  const url = `${env.SCRYFALL_API_BASE}${path}`;
+
+  await reserveSlot();
+
+  return httpPost<T>(url, body, { timeout: 15_000 });
 }

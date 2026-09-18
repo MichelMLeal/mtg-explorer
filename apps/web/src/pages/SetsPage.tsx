@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSets } from '../hooks/useCards';
 
 export default function SetsPage() {
@@ -28,7 +29,7 @@ export default function SetsPage() {
       ) : (
         <div className="sets-grid">
           {filtered.map((set: any) => (
-            <div key={set.code} className="set-card">
+            <Link key={set.code} to={`/sets/${set.code}`} className="set-card">
               <div className="set-icon">
                 <img src={set.iconSvgUri} alt={set.name} width={48} height={48} />
               </div>
@@ -39,7 +40,7 @@ export default function SetsPage() {
                   {set.releasedAt && ` · ${set.releasedAt}`}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

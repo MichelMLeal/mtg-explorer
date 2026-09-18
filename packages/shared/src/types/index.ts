@@ -111,6 +111,7 @@ export interface DeckCard {
   cardName: string;
   quantity: number;
   isSideboard: boolean;
+  imageUri?: string;
 }
 
 export interface Deck {

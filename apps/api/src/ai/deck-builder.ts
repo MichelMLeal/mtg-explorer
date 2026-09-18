@@ -79,6 +79,28 @@ function selectStrategy(style: DeckStyle, colors: MtgColor[]): StrategyProfile {
   return STRATEGIES.aggro;
 }
 
+// When more than one deck is requested, give each variant a distinct
+// archetype instead of building the same strategy 2-3x over.
+function strategiesForCount(style: DeckStyle, colors: MtgColor[], count: number): StrategyProfile[] {
+  const primary = selectStrategy(style, colors);
+  if (count <= 1) return [primary];
+
+  const others = Object.values(STRATEGIES).filter((s) => s !== primary);
+  return [primary, ...others].slice(0, count);
+}
+
+// ponytail: full shuffle of the fetched candidate pool (not just the picked
+// slice), so repeat builds - and each variant in a multi-deck request - pull
+// a different mix instead of always the same top-edhrec cards.
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 function calculateManaCurve(cards: DeckCard[], allCards: Map<string, MtgCard>): ManaCurve {
   const curve: ManaCurve = { '0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6+': 0 };
 
@@ -95,16 +117,12 @@ function calculateManaCurve(cards: DeckCard[], allCards: Map<string, MtgCard>): 
 }
 
 // ── Main Deck Builder ───────────────────────────────────────
-export async function buildDeck(params: {
-  colors: MtgColor[];
-  format: MtgFormat;
-  style: DeckStyle;
-  budget?: number;
-  strategy?: string;
-}): Promise<Deck> {
+async function buildOneDeck(
+  params: { colors: MtgColor[]; format: MtgFormat; style: DeckStyle; budget?: number },
+  strategy: StrategyProfile,
+): Promise<Deck> {
   const { colors, format, style, budget } = params;
   const rules = DECK_RULES[format] || { min: 60, max: 60, sideboard: 15 };
-  const strategy = selectStrategy(style, colors);
 
   log.info({ colors, format, style, strategy: strategy.name }, 'building_deck');
 
@@ -120,18 +138,25 @@ export async function buildDeck(params: {
   ].join(' ');
 
   const creatureResult = await searchCards(creatureQuery, 1, 40);
+  const creatureCandidates = shuffle(creatureResult.data);
   const creatureCount = Math.floor(rules.min * strategy.creatureRatio);
   const isSingleton = format === 'commander';
 
   let added = 0;
-  for (const card of creatureResult.data) {
+  for (const card of creatureCandidates) {
     if (added >= creatureCount) break;
     if (budget && card.prices.usd && parseFloat(card.prices.usd) > budget * 0.1) continue;
 
     const qty = isSingleton || card.rarity === 'mythic' || card.rarity === 'rare' ? 1 : 2;
     if (added + qty > creatureCount) continue;
 
-    deckCards.push({ cardId: card.id, cardName: card.name, quantity: qty, isSideboard: false });
+    deckCards.push({
+      cardId: card.id,
+      cardName: card.name,
+      quantity: qty,
+      isSideboard: false,
+      imageUri: card.imageUris?.small,
+    });
     allCards.set(card.id, card);
     added += qty;
   }
@@ -145,10 +170,11 @@ export async function buildDeck(params: {
   ].join(' ');
 
   const spellResult = await searchCards(spellQuery, 1, 40);
+  const spellCandidates = shuffle(spellResult.data);
   const spellCount = rules.min - creatureCount - strategy.landCount;
 
   added = 0;
-  for (const card of spellResult.data) {
+  for (const card of spellCandidates) {
     if (added >= spellCount) break;
     if (deckCards.some((d) => d.cardId === card.id)) continue;
     if (budget && card.prices.usd && parseFloat(card.prices.usd) > budget * 0.15) continue;
@@ -156,7 +182,13 @@ export async function buildDeck(params: {
     const qty = isSingleton || card.rarity === 'mythic' || card.rarity === 'rare' ? 1 : 2;
     if (added + qty > spellCount) continue;
 
-    deckCards.push({ cardId: card.id, cardName: card.name, quantity: qty, isSideboard: false });
+    deckCards.push({
+      cardId: card.id,
+      cardName: card.name,
+      quantity: qty,
+      isSideboard: false,
+      imageUri: card.imageUris?.small,
+    });
     allCards.set(card.id, card);
     added += qty;
   }
@@ -169,10 +201,11 @@ export async function buildDeck(params: {
   ].join(' ');
 
   const landResult = await searchCards(landQuery, 1, 30);
+  const landCandidates = shuffle(landResult.data);
   const landCount = strategy.landCount;
 
   added = 0;
-  for (const card of landResult.data) {
+  for (const card of landCandidates) {
     if (added >= landCount) break;
     if (deckCards.some((d) => d.cardId === card.id)) continue;
 
@@ -181,7 +214,13 @@ export async function buildDeck(params: {
     const qty = isSingleton ? 1 : card.name.includes('Dual') || card.name.includes('Fetch') ? 1 : 2;
     if (added + qty > landCount) continue;
 
-    deckCards.push({ cardId: card.id, cardName: card.name, quantity: qty, isSideboard: false });
+    deckCards.push({
+      cardId: card.id,
+      cardName: card.name,
+      quantity: qty,
+      isSideboard: false,
+      imageUri: card.imageUris?.small,
+    });
     allCards.set(card.id, card);
     added += qty;
   }
@@ -199,12 +238,19 @@ export async function buildDeck(params: {
     ].join(' ');
 
     const fillResult = await searchCards(fillQuery, 2, 20);
+    const fillCandidates = shuffle(fillResult.data);
     added = 0;
-    for (const card of fillResult.data) {
+    for (const card of fillCandidates) {
       if (added >= remaining) break;
       if (deckCards.some((d) => d.cardId === card.id)) continue;
 
-      deckCards.push({ cardId: card.id, cardName: card.name, quantity: 1, isSideboard: false });
+      deckCards.push({
+        cardId: card.id,
+        cardName: card.name,
+        quantity: 1,
+        isSideboard: false,
+        imageUri: card.imageUris?.small,
+      });
       allCards.set(card.id, card);
       added += 1;
     }
@@ -232,6 +278,21 @@ export async function buildDeck(params: {
     manaCurve,
     createdAt: new Date().toISOString(),
   };
+}
+
+export async function buildDeck(params: {
+  colors: MtgColor[];
+  format: MtgFormat;
+  style: DeckStyle;
+  budget?: number;
+  strategy?: string;
+  count?: number;
+}): Promise<Deck[]> {
+  const { colors, format, style, budget, count = 1 } = params;
+  const strategies = strategiesForCount(style, colors, count);
+  return Promise.all(
+    strategies.map((strategy) => buildOneDeck({ colors, format, style, budget }, strategy)),
+  );
 }
 
 // ── Deck Validator ──────────────────────────────────────────

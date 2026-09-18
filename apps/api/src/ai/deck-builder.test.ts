@@ -138,7 +138,7 @@ describe('validateDeck', () => {
 
 describe('buildDeck', () => {
   it('builds a commander deck that passes its own singleton validation', async () => {
-    const deck = await buildDeck({ colors: ['G'], format: 'commander', style: 'fun' });
+    const [deck] = await buildDeck({ colors: ['G'], format: 'commander', style: 'fun' });
     expect(deck.cards.every((c) => c.quantity === 1)).toBe(true);
 
     const result = validateDeck(deck, 'commander');
@@ -146,8 +146,25 @@ describe('buildDeck', () => {
   });
 
   it('builds a legal-size standard deck', async () => {
-    const deck = await buildDeck({ colors: ['R', 'W'], format: 'standard', style: 'fun' });
+    const [deck] = await buildDeck({ colors: ['R', 'W'], format: 'standard', style: 'fun' });
     const result = validateDeck(deck, 'standard');
     expect(result.errors.some((e) => e.includes('must have'))).toBe(false);
+  });
+
+  it('attaches an image to every card', async () => {
+    const [deck] = await buildDeck({ colors: ['R', 'W'], format: 'standard', style: 'fun' });
+    expect(deck.cards.every((c) => typeof c.imageUri === 'string')).toBe(true);
+  });
+
+  it('defaults to a single deck', async () => {
+    const decks = await buildDeck({ colors: ['R', 'W'], format: 'standard', style: 'fun' });
+    expect(decks).toHaveLength(1);
+  });
+
+  it('builds count distinct-strategy decks when count > 1', async () => {
+    const decks = await buildDeck({ colors: ['R', 'W'], format: 'standard', style: 'fun', count: 3 });
+    expect(decks).toHaveLength(3);
+    const names = decks.map((d) => d.name);
+    expect(new Set(names).size).toBe(3);
   });
 });

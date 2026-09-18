@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCard } from '../hooks/useCards';
+import { useCard, useCardPrints } from '../hooks/useCards';
 import type { LegalityStatus } from '../lib/types';
 
 const FORMAT_LABELS: Record<string, string> = {
@@ -27,6 +27,8 @@ export default function CardDetailPage() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useCard(id || '');
   const card = data?.data;
+  const { data: printsData } = useCardPrints(id || '');
+  const prints = printsData?.data || [];
 
   if (isLoading) {
     return (
@@ -150,6 +152,30 @@ export default function CardDetailPage() {
           )}
         </div>
       </div>
+
+      {prints.length > 1 && (
+        <div className="card-prints">
+          <h3>All Printings ({prints.length})</h3>
+          <div className="prints-strip">
+            {prints.map((print: any) => (
+              <button
+                key={print.id}
+                type="button"
+                className={`print-item ${print.id === card.id ? 'print-item-active' : ''}`}
+                onClick={() => print.id !== card.id && navigate(`/card/${print.id}`)}
+                title={`${print.setName} — ${print.artist}`}
+              >
+                {print.imageUris?.artCrop ? (
+                  <img src={print.imageUris.artCrop} alt={`${print.name} — ${print.setName}`} loading="lazy" />
+                ) : (
+                  <div className="card-image-placeholder">{print.setCode.toUpperCase()}</div>
+                )}
+                <span className="print-set">{print.setCode.toUpperCase()}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ export const CACHE_KEYS = {
   SET_LIST: 'mtg:sets:list',
   SET_DETAIL: (code: string) => `mtg:set:${code}`,
   SET_CARDS: (code: string, page: number) => `mtg:set:${code}:cards:${page}`,
+  CARD_PRINTS: (oracleId: string) => `mtg:card:prints:${oracleId}`,
   RANDOM_CARD: (seed: string) => `mtg:card:random:${seed}`,
   DECK_BUILD: (hash: string) => `mtg:deck:${hash}`,
   FORMATS: 'mtg:formats',
@@ -22,6 +23,7 @@ export const CACHE_TTL = {
   CARD_DETAIL: 600, // 10 min
   SET_LIST: 3600, // 1 hour
   SET_DETAIL: 1800, // 30 min
+  CARD_PRINTS: 3600, // 1 hour
   RANDOM_CARD: 60, // 1 min
   DECK_BUILD: 1800, // 30 min
   FORMATS: 86400, // 24 hours

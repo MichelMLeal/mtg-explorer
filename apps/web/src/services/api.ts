@@ -33,6 +33,10 @@ export async function getCardById(id: string) {
   return apiFetch<any>(`/api/cards/${id}`);
 }
 
+export async function getCardPrints(id: string) {
+  return apiFetch<{ data: any[] }>(`/api/cards/${id}/prints`);
+}
+
 export async function getRandomCard() {
   return apiFetch<any>('/api/cards/random');
 }
@@ -59,8 +63,9 @@ export async function buildDeck(params: {
   style: string;
   budget?: number;
   strategy?: string;
+  count?: number;
 }) {
-  return apiFetch<{ data: any }>('/api/deck/build', {
+  return apiFetch<{ data: any[] }>('/api/deck/build', {
     method: 'POST',
     body: JSON.stringify(params),
   });

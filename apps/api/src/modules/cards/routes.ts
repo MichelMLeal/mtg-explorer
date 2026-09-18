@@ -59,4 +59,16 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
     if (!card) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Card not found' } });
     return reply.send({ data: card });
   });
+
+  // ── GET /api/cards/:id/prints — All printings of a card ──
+  app.get('/api/cards/:id/prints', async (request, reply) => {
+    const parsed = CardParamsSchema.safeParse(request.params);
+    if (!parsed.success) return reply.status(400).send(formatZodError(parsed.error));
+
+    const card = await scryfall.getCardById(parsed.data.id);
+    if (!card) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Card not found' } });
+
+    const prints = await scryfall.getCardPrints(card.oracleId);
+    return reply.send({ data: prints });
+  });
 }

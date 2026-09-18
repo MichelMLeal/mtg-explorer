@@ -27,7 +27,8 @@ export const ArenaIdSchema = z.object({
 
 // ── Set ─────────────────────────────────────────────────────
 export const SetParamsSchema = z.object({
-  code: z.string().length(3).toLowerCase(),
+  // Scryfall set codes aren't always 3 chars (e.g. "thob" for The Hobbit) - seen 3-6 in the wild.
+  code: z.string().min(3).max(6).toLowerCase(),
 });
 
 // ── Deck Build ──────────────────────────────────────────────
@@ -37,6 +38,7 @@ export const DeckBuildSchema = z.object({
   style: z.enum(DECK_STYLES),
   budget: z.number().positive().optional(),
   strategy: z.string().max(500).optional(),
+  count: z.coerce.number().int().min(1).max(3).default(1),
 });
 
 export type DeckBuildParams = z.infer<typeof DeckBuildSchema>;

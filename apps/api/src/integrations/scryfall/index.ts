@@ -261,3 +261,30 @@ export async function getSetCards(
   await cacheSet(cacheKey, response, CACHE_TTL.CARD_DETAIL);
   return response;
 }
+
+export async function getCardPrints(oracleId: string): Promise<MtgCard[]> {
+  const cacheKey = CACHE_KEYS.CARD_PRINTS(oracleId);
+  const cached = await cacheGet<MtgCard[]>(cacheKey);
+  if (cached) return cached;
+
+  const params = new URLSearchParams({
+    q: `oracleid:${oracleId}`,
+    unique: 'prints',
+    order: 'released',
+    format: 'json',
+  });
+
+  let result: ScryfallListResponse<ScryfallCard>;
+  try {
+    result = await scryfallGet<ScryfallListResponse<ScryfallCard>>(
+      `/cards/search?${params.toString()}`,
+    );
+  } catch (err: any) {
+    if (err.status === 404) return [];
+    throw err;
+  }
+
+  const prints = result.data.map(mapCard);
+  await cacheSet(cacheKey, prints, CACHE_TTL.CARD_PRINTS);
+  return prints;
+}

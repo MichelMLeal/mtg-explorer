@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { searchCards, getCardById, getSets, getSetCards, getFormats, buildDeck, getRandomCard } from '../services/api';
+import { searchCards, getCardById, getCardPrints, getSets, getSetCards, getFormats, buildDeck, getRandomCard } from '../services/api';
 
 export function useCardSearch(query: string, page = 1) {
   return useQuery({
@@ -13,6 +13,14 @@ export function useCard(id: string) {
   return useQuery({
     queryKey: ['card', id],
     queryFn: () => getCardById(id),
+    enabled: !!id,
+  });
+}
+
+export function useCardPrints(id: string) {
+  return useQuery({
+    queryKey: ['card', id, 'prints'],
+    queryFn: () => getCardPrints(id),
     enabled: !!id,
   });
 }
@@ -52,6 +60,7 @@ export function useBuildDeck(params: {
   style: string;
   budget?: number;
   strategy?: string;
+  count?: number;
 }) {
   return useQuery({
     queryKey: ['deck', 'build', params],

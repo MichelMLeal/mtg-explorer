@@ -4,6 +4,7 @@ import {
   CardParamsSchema,
   DeckBuildSchema,
   PaginationSchema,
+  SetParamsSchema,
 } from './index.js';
 
 describe('CardSearchSchema', () => {
@@ -117,6 +118,24 @@ describe('DeckBuildSchema', () => {
       budget: -10,
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('SetParamsSchema', () => {
+  it('accepts a 3-char code', () => {
+    expect(SetParamsSchema.safeParse({ code: 'mom' }).success).toBe(true);
+  });
+
+  it('accepts longer codes like The Hobbit (thob)', () => {
+    expect(SetParamsSchema.safeParse({ code: 'thob' }).success).toBe(true);
+  });
+
+  it('rejects codes shorter than 3 chars', () => {
+    expect(SetParamsSchema.safeParse({ code: 'ab' }).success).toBe(false);
+  });
+
+  it('rejects codes longer than 6 chars', () => {
+    expect(SetParamsSchema.safeParse({ code: 'toolongcode' }).success).toBe(false);
   });
 });
 

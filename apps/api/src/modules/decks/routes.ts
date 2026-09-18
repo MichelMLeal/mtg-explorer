@@ -19,8 +19,8 @@ export async function deckRoutes(app: FastifyInstance): Promise<void> {
     const parsed = DeckBuildSchema.safeParse(request.body);
     if (!parsed.success) return reply.status(400).send(formatZodError(parsed.error));
 
-    const deck = await buildDeck(parsed.data);
-    return reply.send({ data: deck });
+    const decks = await buildDeck(parsed.data);
+    return reply.send({ data: decks });
   });
 
   // ── POST /api/deck/validate — Validate a deck ────────────

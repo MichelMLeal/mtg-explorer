@@ -18,15 +18,17 @@ export default function DeckBuilderPage() {
   const [format, setFormat] = useState<MtgFormat>('standard');
   const [style, setStyle] = useState<DeckStyle>('fun');
   const [budget, setBudget] = useState<number | undefined>(undefined);
+  const [count, setCount] = useState(1);
 
   const { data, isLoading, error, refetch } = useBuildDeck({
     colors,
     format,
     style,
     budget,
+    count,
   });
 
-  const deck = data?.data;
+  const decks = data?.data || [];
 
   const handleBuild = () => {
     if (colors.length > 0) {
@@ -90,6 +92,22 @@ export default function DeckBuilderPage() {
           />
         </div>
 
+        <div className="config-section">
+          <h3>How many decks</h3>
+          <div className="style-buttons">
+            {[1, 2, 3].map((n) => (
+              <button
+                key={n}
+                className={`style-button ${count === n ? 'selected' : ''}`}
+                onClick={() => setCount(n)}
+                type="button"
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <button
           className="btn btn-primary btn-build"
           onClick={handleBuild}
@@ -105,8 +123,8 @@ export default function DeckBuilderPage() {
         </div>
       )}
 
-      {deck && (
-        <div className="deck-result">
+      {decks.map((deck: any, deckIndex: number) => (
+        <div className="deck-result" key={deck.id || deckIndex}>
           <div className="deck-header">
             <h2>{deck.name}</h2>
             <div className="deck-stats">
@@ -119,14 +137,14 @@ export default function DeckBuilderPage() {
           <div className="mana-curve-chart">
             <h3>Mana Curve</h3>
             <div className="curve-bars">
-              {Object.entries(deck.manaCurve).map(([cost, count]) => (
+              {Object.entries(deck.manaCurve).map(([cost, curveCount]) => (
                 <div key={cost} className="curve-bar-wrapper">
                   <div
                     className="curve-bar"
-                    style={{ height: `${Math.min(((count as number) / 20) * 100, 100)}%` }}
+                    style={{ height: `${Math.min(((curveCount as number) / 20) * 100, 100)}%` }}
                   />
                   <div className="curve-label">{cost}</div>
-                  <div className="curve-count">{String(count)}</div>
+                  <div className="curve-count">{String(curveCount)}</div>
                 </div>
               ))}
             </div>
@@ -137,6 +155,9 @@ export default function DeckBuilderPage() {
             <div className="deck-cards">
               {deck.cards.map((card: any, i: number) => (
                 <div key={i} className="deck-card-item">
+                  {card.imageUri ? (
+                    <img src={card.imageUri} alt={card.cardName} className="deck-card-thumb" loading="lazy" />
+                  ) : null}
                   <span className="deck-card-qty">{card.quantity}x</span>
                   <span className="deck-card-name">{card.cardName}</span>
                 </div>
@@ -144,7 +165,7 @@ export default function DeckBuilderPage() {
             </div>
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }

@@ -4,7 +4,8 @@ export const SCRYFALL_RATE_LIMIT = 10; // requests per second
 
 // ── Cache Keys ──────────────────────────────────────────────
 export const CACHE_KEYS = {
-  CARD_SEARCH: (q: string, page: number) => `mtg:card:search:${q}:${page}`,
+  CARD_SEARCH: (q: string, page: number, order: string, dir: string) =>
+    `mtg:card:search:${q}:${page}:${order}:${dir}`,
   CARD_DETAIL: (id: string) => `mtg:card:${id}`,
   CARD_BY_NAME: (name: string) => `mtg:card:name:${name.toLowerCase()}`,
   CARD_BY_ARENA: (id: number) => `mtg:card:arena:${id}`,

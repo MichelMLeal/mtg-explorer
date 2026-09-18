@@ -24,8 +24,16 @@ export interface CardSearchResult {
   hasMore: boolean;
 }
 
-export async function searchCards(query: string, page = 1, perPage = 20): Promise<CardSearchResult> {
+export async function searchCards(
+  query: string,
+  page = 1,
+  perPage = 20,
+  order?: string,
+  dir?: string,
+): Promise<CardSearchResult> {
   const params = new URLSearchParams({ q: query, page: String(page), perPage: String(perPage) });
+  if (order) params.set('order', order);
+  if (dir) params.set('dir', dir);
   return apiFetch(`/api/cards?${params.toString()}`);
 }
 
@@ -44,11 +52,6 @@ export async function getRandomCard() {
 // ── Sets ───────────────────────────────────────────────────
 export async function getSets() {
   return apiFetch<{ data: any[] }>('/api/sets');
-}
-
-export async function getSetCards(code: string, page = 1) {
-  const params = new URLSearchParams({ page: String(page) });
-  return apiFetch<CardSearchResult>(`/api/sets/${code}/cards?${params.toString()}`);
 }
 
 // ── Formats ────────────────────────────────────────────────

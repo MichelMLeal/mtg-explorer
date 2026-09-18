@@ -19,8 +19,8 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
     const parsed = CardSearchSchema.safeParse(request.query);
     if (!parsed.success) return reply.status(400).send(formatZodError(parsed.error));
 
-    const { q, page, perPage } = parsed.data;
-    const result = await scryfall.searchCards(q, page, perPage);
+    const { q, page, perPage, order, dir } = parsed.data;
+    const result = await scryfall.searchCards(q, page, perPage, order, dir);
     return reply.send(result);
   });
 

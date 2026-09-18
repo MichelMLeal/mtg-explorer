@@ -1,16 +1,48 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useSetCards, useSets } from '../hooks/useCards';
+import { useCardSearch, useSets } from '../hooks/useCards';
+import type { MtgColor } from '../lib/types';
+import ManaFilter from '../components/ManaFilter';
 import CardGrid from '../components/CardGrid';
+
+const RARITIES = ['common', 'uncommon', 'rare', 'mythic'] as const;
+const CARD_TYPES = ['creature', 'instant', 'sorcery', 'enchantment', 'artifact', 'planeswalker', 'land'] as const;
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'name', label: 'Name' },
+  { value: 'cmc', label: 'Mana Value' },
+  { value: 'color', label: 'Color' },
+  { value: 'rarity', label: 'Rarity' },
+  { value: 'price', label: 'Price' },
+  { value: 'edhrec_rank', label: 'Popularity' },
+];
 
 export default function SetDetailPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [rarity, setRarity] = useState('');
+  const [colors, setColors] = useState<MtgColor[]>([]);
+  const [cardType, setCardType] = useState('');
+  const [order, setOrder] = useState('name');
+  const [dir, setDir] = useState<'asc' | 'desc'>('asc');
 
-  const { data, isLoading, error } = useSetCards(code || '', page);
+  const query = [
+    `set:${code}`,
+    rarity && `r:${rarity}`,
+    colors.length > 0 && `c:${colors.join('')}`,
+    cardType && `t:${cardType}`,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const { data, isLoading, error } = useCardSearch(query, page, order, dir);
   const { data: setsData } = useSets();
   const set = setsData?.data?.find((s: any) => s.code === code);
+
+  const updateFilters = (fn: () => void) => {
+    fn();
+    setPage(1);
+  };
 
   return (
     <div className="search-page">
@@ -25,6 +57,68 @@ export default function SetDetailPage() {
             {set.releasedAt && ` · ${set.releasedAt}`}
           </p>
         )}
+      </div>
+
+      <div className="set-filters">
+        <div className="set-filter-group">
+          <label>Color</label>
+          <ManaFilter selected={colors} onChange={(c) => updateFilters(() => setColors(c))} />
+        </div>
+
+        <div className="set-filter-group">
+          <label>Rarity</label>
+          <select
+            className="select-input"
+            value={rarity}
+            onChange={(e) => updateFilters(() => setRarity(e.target.value))}
+          >
+            <option value="">Any</option>
+            {RARITIES.map((r) => (
+              <option key={r} value={r}>
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="set-filter-group">
+          <label>Type</label>
+          <select
+            className="select-input"
+            value={cardType}
+            onChange={(e) => updateFilters(() => setCardType(e.target.value))}
+          >
+            <option value="">Any</option>
+            {CARD_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="set-filter-group">
+          <label>Sort by</label>
+          <select className="select-input" value={order} onChange={(e) => setOrder(e.target.value)}>
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="set-filter-group">
+          <label>Direction</label>
+          <select
+            className="select-input"
+            value={dir}
+            onChange={(e) => setDir(e.target.value as 'asc' | 'desc')}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
       </div>
 
       {error && (

@@ -530,6 +530,26 @@ a:hover { color: var(--accent-hover); }
 .set-name { font-weight: 600; }
 .set-meta { color: var(--text-secondary); font-size: 0.85rem; }
 
+.set-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  align-items: flex-end;
+  margin-bottom: var(--space-lg);
+  text-align: left;
+}
+.set-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 160px;
+}
+.set-filter-group label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.set-filter-group .select-input { padding: var(--space-sm) var(--space-md); }
+
 /* ── States ───────────────────────────────────────────────── */
 .loading { padding: var(--space-2xl); color: var(--text-secondary); }
 .empty-state { padding: var(--space-2xl); color: var(--text-muted); }

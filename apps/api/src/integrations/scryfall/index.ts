@@ -135,8 +135,13 @@ export async function searchCards(
   query: string,
   page = 1,
   perPage = 20,
+  // Left undefined by internal callers (e.g. the deck builder) so an
+  // `order:` keyword already embedded in `query` keeps governing. The
+  // /api/cards route always passes explicit values from CardSearchSchema.
+  order?: string,
+  dir?: string,
 ): Promise<{ data: MtgCard[]; totalCards: number; hasMore: boolean }> {
-  const cacheKey = CACHE_KEYS.CARD_SEARCH(query, page);
+  const cacheKey = CACHE_KEYS.CARD_SEARCH(query, page, order ?? '-', dir ?? '-');
   const cached = await cacheGet<{ data: MtgCard[]; totalCards: number; hasMore: boolean }>(cacheKey);
   if (cached) return cached;
 
@@ -146,6 +151,8 @@ export async function searchCards(
     per_page: String(perPage),
     format: 'json',
   });
+  if (order) params.set('order', order);
+  if (dir) params.set('dir', dir);
 
   let result: ScryfallListResponse<ScryfallCard>;
   try {

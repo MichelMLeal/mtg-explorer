@@ -20,19 +20,13 @@ export default function DeckBuilderPage() {
   const [budget, setBudget] = useState<number | undefined>(undefined);
   const [count, setCount] = useState(1);
 
-  const { data, isLoading, error, refetch } = useBuildDeck({
-    colors,
-    format,
-    style,
-    budget,
-    count,
-  });
+  const { data, isPending, error, mutate } = useBuildDeck();
 
   const decks = data?.data || [];
 
   const handleBuild = () => {
     if (colors.length > 0) {
-      refetch();
+      mutate({ colors, format, style, budget, count });
     }
   };
 
@@ -111,9 +105,9 @@ export default function DeckBuilderPage() {
         <button
           className="btn btn-primary btn-build"
           onClick={handleBuild}
-          disabled={colors.length === 0 || isLoading}
+          disabled={colors.length === 0 || isPending}
         >
-          {isLoading ? 'Building...' : '⚡ Build Deck'}
+          {isPending ? 'Building...' : '⚡ Build Deck'}
         </button>
       </div>
 

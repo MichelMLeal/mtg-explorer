@@ -58,17 +58,30 @@ export async function httpGet<T>(url: string, options: RequestOptions = {}): Pro
 let lastRequestTime = 0;
 const MIN_INTERVAL_MS = 100; // 10 req/s = 100ms between requests
 
+// Concurrent callers (e.g. building several decks in parallel) used to race:
+// each read the same stale `lastRequestTime` before any of them updated it,
+// so the throttle below did nothing under concurrency and Scryfall would
+// eventually answer with a real 429. Chaining onto `slotQueue` serializes the
+// "wait for a slot" step so only one caller resolves it at a time.
+let slotQueue: Promise<void> = Promise.resolve();
+
+function reserveSlot(): Promise<void> {
+  const slot = slotQueue.then(async () => {
+    const elapsed = Date.now() - lastRequestTime;
+    if (elapsed < MIN_INTERVAL_MS) {
+      await new Promise((r) => setTimeout(r, MIN_INTERVAL_MS - elapsed));
+    }
+    lastRequestTime = Date.now();
+  });
+  slotQueue = slot;
+  return slot;
+}
+
 export async function scryfallGet<T>(path: string): Promise<T> {
   const env = getEnv();
   const url = `${env.SCRYFALL_API_BASE}${path}`;
 
-  // Enforce rate limit
-  const now = Date.now();
-  const elapsed = now - lastRequestTime;
-  if (elapsed < MIN_INTERVAL_MS) {
-    await new Promise((r) => setTimeout(r, MIN_INTERVAL_MS - elapsed));
-  }
-  lastRequestTime = Date.now();
+  await reserveSlot();
 
   return httpGet<T>(url, { timeout: 15_000 });
 }

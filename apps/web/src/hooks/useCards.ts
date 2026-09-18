@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import { searchCards, getCardById, getCardPrints, getSets, getSetCards, getFormats, buildDeck, getRandomCard } from '../services/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { searchCards, getCardById, getCardPrints, getSets, getFormats, buildDeck, getRandomCard } from '../services/api';
 
-export function useCardSearch(query: string, page = 1) {
+export function useCardSearch(query: string, page = 1, order?: string, dir?: string) {
   return useQuery({
-    queryKey: ['cards', 'search', query, page],
-    queryFn: () => searchCards(query, page),
+    queryKey: ['cards', 'search', query, page, order, dir],
+    queryFn: () => searchCards(query, page, 20, order, dir),
     enabled: query.length > 0,
   });
 }
@@ -39,14 +39,6 @@ export function useSets() {
   });
 }
 
-export function useSetCards(code: string, page = 1) {
-  return useQuery({
-    queryKey: ['sets', code, page],
-    queryFn: () => getSetCards(code, page),
-    enabled: !!code,
-  });
-}
-
 export function useFormats() {
   return useQuery({
     queryKey: ['formats'],
@@ -54,17 +46,15 @@ export function useFormats() {
   });
 }
 
-export function useBuildDeck(params: {
-  colors: string[];
-  format: string;
-  style: string;
-  budget?: number;
-  strategy?: string;
-  count?: number;
-}) {
-  return useQuery({
-    queryKey: ['deck', 'build', params],
-    queryFn: () => buildDeck(params),
-    enabled: params.colors.length > 0 && !!params.format,
+export function useBuildDeck() {
+  return useMutation({
+    mutationFn: (params: {
+      colors: string[];
+      format: string;
+      style: string;
+      budget?: number;
+      strategy?: string;
+      count?: number;
+    }) => buildDeck(params),
   });
 }

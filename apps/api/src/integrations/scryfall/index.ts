@@ -147,9 +147,18 @@ export async function searchCards(
     format: 'json',
   });
 
-  const result = await scryfallGet<ScryfallListResponse<ScryfallCard>>(
-    `/cards/search?${params.toString()}`,
-  );
+  let result: ScryfallListResponse<ScryfallCard>;
+  try {
+    result = await scryfallGet<ScryfallListResponse<ScryfallCard>>(
+      `/cards/search?${params.toString()}`,
+    );
+  } catch (err: any) {
+    // Scryfall returns 404 when a search matches zero cards, not an empty list.
+    if (err.status === 404) {
+      return { data: [], totalCards: 0, hasMore: false };
+    }
+    throw err;
+  }
 
   const data = result.data.map(mapCard);
   const response = {

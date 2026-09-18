@@ -25,7 +25,7 @@ export interface CardSearchResult {
 }
 
 export async function searchCards(query: string, page = 1, perPage = 20): Promise<CardSearchResult> {
-  const params = new URLSearchParams({ q: query, page: String(page), per_page: String(perPage) });
+  const params = new URLSearchParams({ q: query, page: String(page), perPage: String(perPage) });
   return apiFetch(`/api/cards?${params.toString()}`);
 }
 

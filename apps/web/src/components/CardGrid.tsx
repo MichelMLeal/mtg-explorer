@@ -1,4 +1,5 @@
 import type { MtgCard } from '../lib/types';
+import LoadingImage from './LoadingImage';
 
 interface CardGridProps {
   cards: MtgCard[];
@@ -23,12 +24,7 @@ export default function CardGrid({ cards, onCardClick }: CardGridProps) {
         >
           <div className="card-image-wrapper">
             {card.imageUris?.normal ? (
-              <img
-                src={card.imageUris.normal}
-                alt={card.name}
-                className="card-image"
-                loading="lazy"
-              />
+              <LoadingImage src={card.imageUris.normal} alt={card.name} className="card-image" />
             ) : (
               <div className="card-image-placeholder">{card.name}</div>
             )}
@@ -43,7 +39,7 @@ export default function CardGrid({ cards, onCardClick }: CardGridProps) {
 
           {card.imageUris?.large && (
             <div className="card-hover-preview">
-              <img src={card.imageUris.large} alt={card.name} />
+              <LoadingImage src={card.imageUris.large} alt={card.name} />
               <div className="card-hover-meta">
                 <span>{card.rarity}</span>
                 {card.prices?.usd && <span>${card.prices.usd}</span>}

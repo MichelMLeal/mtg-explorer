@@ -246,9 +246,12 @@ a:hover { color: var(--accent-hover); }
 }
 .card-hover-preview img {
   width: 100%;
+  aspect-ratio: 488 / 680;
+  object-fit: cover;
   border-radius: var(--radius-md);
   display: block;
 }
+.card-hover-preview .loading-image-wrapper { border-radius: var(--radius-md); }
 .card-hover-meta {
   display: flex;
   justify-content: space-between;
@@ -290,12 +293,16 @@ a:hover { color: var(--accent-hover); }
 
 .card-detail-image {
   width: 100%;
+  aspect-ratio: 488 / 680;
+  object-fit: cover;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
 }
 
 .card-detail-art {
   width: 100%;
+  aspect-ratio: 626 / 457;
+  object-fit: cover;
   border-radius: var(--radius-lg);
   margin-top: var(--space-md);
 }
@@ -544,25 +551,33 @@ a:hover { color: var(--accent-hover); }
   transform: translateX(-50%) scale(1);
 }
 .deck-card-qty { color: var(--accent); font-weight: 600; min-width: 30px; }
-.card-thumb-wrapper {
+/* ── Loading image (generic: spinner until onLoad fires) ───── */
+.loading-image-wrapper {
   position: relative;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
+  display: block;
+  width: 100%;
+  border-radius: inherit;
 }
-.card-thumb-spinner {
+/* Inside a fixed-aspect-ratio parent (card grid tiles), fill it fully.
+   Elsewhere the wrapper's height comes from the img's own aspect-ratio
+   (set per use below), so the spinner has a real box to fill before the
+   image has loaded/decoded. */
+.card-image-wrapper .loading-image-wrapper {
+  height: 100%;
+}
+.loading-image-spinner {
   position: absolute;
   inset: 0;
-  border-radius: var(--radius-sm);
+  border-radius: inherit;
   background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.card-thumb-spinner::after {
+.loading-image-spinner::after {
   content: '';
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
   border: 2px solid var(--border-color);
   border-top-color: var(--accent);
   border-radius: 50%;
@@ -571,18 +586,20 @@ a:hover { color: var(--accent-hover); }
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+.image-loading { opacity: 0; }
+.image-loaded { opacity: 1; transition: opacity 0.15s ease; }
 
+/* fixed 32px variant, used for the small deck-list card rows */
+.card-thumb-wrapper { width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--radius-sm); }
+.card-thumb-wrapper .loading-image-spinner::after { width: 14px; height: 14px; }
 .deck-card-thumb {
   position: absolute;
   inset: 0;
-  width: 32px;
-  height: 32px;
+  width: 100%;
+  height: 100%;
   border-radius: var(--radius-sm);
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.15s ease;
 }
-.deck-card-thumb.thumb-loaded { opacity: 1; }
 
 /* ── Card Prints ──────────────────────────────────────────── */
 .card-prints { margin-top: var(--space-2xl); text-align: left; }

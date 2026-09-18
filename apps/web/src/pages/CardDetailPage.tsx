@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCard, useCardPrints } from '../hooks/useCards';
 import type { LegalityStatus } from '../lib/types';
+import LoadingImage from '../components/LoadingImage';
 
 const FORMAT_LABELS: Record<string, string> = {
   standard: 'Standard',
@@ -57,13 +58,13 @@ export default function CardDetailPage() {
 
       <div className="card-detail-layout">
         <div className="card-detail-images">
-          <img
+          <LoadingImage
             src={card.imageUris?.large || card.imageUris?.normal}
             alt={card.name}
             className="card-detail-image"
           />
           {card.imageUris?.artCrop && (
-            <img
+            <LoadingImage
               src={card.imageUris.artCrop}
               alt={`${card.name} art`}
               className="card-detail-art"
@@ -166,7 +167,7 @@ export default function CardDetailPage() {
                 title={`${print.setName} — ${print.artist}`}
               >
                 {print.imageUris?.artCrop ? (
-                  <img src={print.imageUris.artCrop} alt={`${print.name} — ${print.setName}`} loading="lazy" />
+                  <LoadingImage src={print.imageUris.artCrop} alt={`${print.name} — ${print.setName}`} />
                 ) : (
                   <div className="card-image-placeholder">{print.setCode.toUpperCase()}</div>
                 )}

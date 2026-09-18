@@ -10,6 +10,9 @@ export type {
   PaginatedResponse,
   TopDeckEntry,
   DeckCardEntry,
+  Ruling,
+  ManaSymbol,
+  CatalogName,
   MtgColor,
   MtgFormat,
   MtgRarity,
@@ -25,6 +28,7 @@ export {
   RARITIES,
   CARD_TYPES,
   DECK_STYLES,
+  CATALOG_NAMES,
 } from './types/index.js';
 
 export {
@@ -32,11 +36,13 @@ export {
   CardParamsSchema,
   CardNameSchema,
   ArenaIdSchema,
+  AutocompleteQuerySchema,
   SetParamsSchema,
   DeckBuildSchema,
   DeckValidateSchema,
   PaginationSchema,
   TopDecksQuerySchema,
+  CatalogParamsSchema,
 } from './schemas/index.js';
 
 export type {

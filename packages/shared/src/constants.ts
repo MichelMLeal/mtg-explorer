@@ -13,6 +13,10 @@ export const CACHE_KEYS = {
   SET_DETAIL: (code: string) => `mtg:set:${code}`,
   SET_CARDS: (code: string, page: number) => `mtg:set:${code}:cards:${page}`,
   CARD_PRINTS: (oracleId: string) => `mtg:card:prints:${oracleId}`,
+  CARD_AUTOCOMPLETE: (q: string) => `mtg:card:autocomplete:${q.toLowerCase()}`,
+  CARD_RULINGS: (id: string) => `mtg:card:rulings:${id}`,
+  SYMBOLOGY: 'mtg:symbology',
+  CATALOG: (name: string) => `mtg:catalog:${name}`,
   RANDOM_CARD: (seed: string) => `mtg:card:random:${seed}`,
   DECK_BUILD: (hash: string) => `mtg:deck:${hash}`,
   FORMATS: 'mtg:formats',
@@ -29,6 +33,10 @@ export const CACHE_TTL = {
   SET_LIST: 3600, // 1 hour
   SET_DETAIL: 1800, // 30 min
   CARD_PRINTS: 3600, // 1 hour
+  CARD_AUTOCOMPLETE: 3600, // 1 hour - suggestion lists barely change
+  CARD_RULINGS: 86400, // 24 hours - rulings are rarely added
+  SYMBOLOGY: 86400, // 24 hours - the symbol set almost never changes
+  CATALOG: 86400, // 24 hours
   RANDOM_CARD: 60, // 1 min
   DECK_BUILD: 1800, // 30 min
   FORMATS: 86400, // 24 hours

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useCardSearch, useSets } from '../hooks/useCards';
+import { useCardSearch, useSets, useCatalog } from '../hooks/useCards';
 import type { MtgColor } from '../lib/types';
 import ManaFilter from '../components/ManaFilter';
 import CardGrid from '../components/CardGrid';
@@ -23,14 +23,19 @@ export default function SetDetailPage() {
   const [rarity, setRarity] = useState('');
   const [colors, setColors] = useState<MtgColor[]>([]);
   const [cardType, setCardType] = useState('');
+  const [keyword, setKeyword] = useState('');
   const [order, setOrder] = useState('name');
   const [dir, setDir] = useState<'asc' | 'desc'>('asc');
+
+  const { data: keywordsData } = useCatalog('keyword-abilities');
+  const keywords: string[] = keywordsData?.data || [];
 
   const query = [
     `set:${code}`,
     rarity && `r:${rarity}`,
     colors.length > 0 && `c:${colors.join('')}`,
     cardType && `t:${cardType}`,
+    keyword && `kw:"${keyword}"`,
   ]
     .filter(Boolean)
     .join(' ');
@@ -92,6 +97,22 @@ export default function SetDetailPage() {
             {CARD_TYPES.map((t) => (
               <option key={t} value={t}>
                 {t.charAt(0).toUpperCase() + t.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="set-filter-group">
+          <label>Keyword</label>
+          <select
+            className="select-input"
+            value={keyword}
+            onChange={(e) => updateFilters(() => setKeyword(e.target.value))}
+          >
+            <option value="">Any</option>
+            {[...keywords].sort().map((kw) => (
+              <option key={kw} value={kw}>
+                {kw}
               </option>
             ))}
           </select>

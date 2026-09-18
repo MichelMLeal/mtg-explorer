@@ -164,6 +164,34 @@ export interface TopDeckEntry {
   sideboard: DeckCardEntry[];
 }
 
+// ── Rulings ───────────────────────────────────────────────
+export interface Ruling {
+  source: string;
+  publishedAt: string;
+  comment: string;
+}
+
+// ── Mana Symbols (Scryfall /symbology) ───────────────────────
+export interface ManaSymbol {
+  symbol: string;
+  svgUri: string;
+  english: string;
+}
+
+// ── Catalog names we proxy from Scryfall's /catalog/* ────────
+export const CATALOG_NAMES = [
+  'creature-types',
+  'land-types',
+  'artifact-types',
+  'enchantment-types',
+  'spell-types',
+  'keyword-abilities',
+  'keyword-actions',
+  'ability-words',
+  'watermarks',
+] as const;
+export type CatalogName = (typeof CATALOG_NAMES)[number];
+
 // ── API Pagination ──────────────────────────────────────────
 export interface PaginatedResponse<T> {
   data: T[];

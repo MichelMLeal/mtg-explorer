@@ -126,8 +126,13 @@ a:hover { color: var(--accent-hover); }
   margin: 0 auto var(--space-lg);
 }
 
-.search-input {
+.search-input-wrapper {
+  position: relative;
   flex: 1;
+}
+
+.search-input {
+  width: 100%;
   padding: var(--space-md);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -139,6 +144,34 @@ a:hover { color: var(--accent-hover); }
 }
 .search-input:focus { border-color: var(--accent); }
 .search-input::placeholder { color: var(--text-muted); }
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hover);
+  list-style: none;
+  padding: var(--space-xs) 0;
+}
+.search-suggestions li button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+.search-suggestions li button:hover { background: var(--bg-card-hover); }
 
 .search-button {
   padding: var(--space-md) var(--space-lg);
@@ -385,6 +418,22 @@ a:hover { color: var(--accent-hover); }
 .mana-button.mana-b.selected { border-color: var(--mtg-black); background: rgba(21, 11, 0, 0.3); }
 .mana-button.mana-r.selected { border-color: var(--mtg-red); background: rgba(211, 32, 42, 0.1); }
 .mana-button.mana-g.selected { border-color: var(--mtg-green); background: rgba(0, 115, 62, 0.1); }
+.mana-icon-img { width: 20px; height: 20px; }
+
+.mana-cost { display: inline-flex; align-items: center; gap: 2px; vertical-align: middle; }
+.mana-symbol { width: 1.3em; height: 1.3em; vertical-align: -0.2em; }
+
+/* ── Rulings ──────────────────────────────────────────────── */
+.card-rulings { margin-top: var(--space-2xl); text-align: left; }
+.rulings-list { display: flex; flex-direction: column; gap: var(--space-md); }
+.ruling-item {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border-color);
+}
+.ruling-date { color: var(--text-secondary); font-size: 0.8rem; }
+.ruling-comment { margin-top: var(--space-xs); line-height: 1.6; }
 
 /* ── Deck Builder ─────────────────────────────────────────── */
 .deck-builder { text-align: center; }
@@ -489,7 +538,11 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius-xl);
   padding: var(--space-xl);
   border: 1px solid var(--border-color);
+  margin-top: var(--space-xl);
 }
+.deck-result.imported-deck { border-color: var(--accent); }
+.imported-deck-meta { margin-bottom: var(--space-lg); }
+.deck-list-actions { margin-bottom: var(--space-md); }
 
 .deck-header {
   display: flex;

@@ -45,6 +45,14 @@ export async function getCardPrints(id: string) {
   return apiFetch<{ data: any[] }>(`/api/cards/${id}/prints`);
 }
 
+export async function getCardRulings(id: string) {
+  return apiFetch<{ data: any[] }>(`/api/cards/${id}/rulings`);
+}
+
+export async function getAutocomplete(q: string) {
+  return apiFetch<{ data: string[] }>(`/api/cards/autocomplete?q=${encodeURIComponent(q)}`);
+}
+
 export async function getRandomCard() {
   return apiFetch<any>('/api/cards/random');
 }
@@ -57,6 +65,15 @@ export async function getSets() {
 // ── Formats ────────────────────────────────────────────────
 export async function getFormats() {
   return apiFetch<{ data: any[] }>('/api/formats');
+}
+
+// ── Reference (symbols, catalogs) ───────────────────────────
+export async function getSymbology() {
+  return apiFetch<{ data: any[] }>('/api/symbology');
+}
+
+export async function getCatalog(name: string) {
+  return apiFetch<{ data: string[] }>(`/api/catalog/${name}`);
 }
 
 // ── Top Decks ──────────────────────────────────────────────

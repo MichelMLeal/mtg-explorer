@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import type { MtgColor, MtgFormat, DeckStyle } from '../lib/types';
 import ManaFilter from '../components/ManaFilter';
-import CardThumb from '../components/CardThumb';
+import DeckCardRow from '../components/DeckCardRow';
 import { useBuildDeck } from '../hooks/useCards';
 
 const FORMATS: MtgFormat[] = [
@@ -15,6 +16,8 @@ const STYLE_OPTIONS: { value: DeckStyle; label: string; icon: string }[] = [
 ];
 
 export default function DeckBuilderPage() {
+  const location = useLocation();
+  const [importedDeck, setImportedDeck] = useState<any>((location.state as any)?.importedDeck ?? null);
   const [colors, setColors] = useState<MtgColor[]>([]);
   const [format, setFormat] = useState<MtgFormat>('standard');
   const [style, setStyle] = useState<DeckStyle>('fun');
@@ -149,21 +152,48 @@ export default function DeckBuilderPage() {
             <h3>Cards</h3>
             <div className="deck-cards">
               {deck.cards.map((card: any, i: number) => (
-                <div key={i} className="deck-card-item">
-                  {card.imageUri && <CardThumb src={card.imageUri} alt={card.cardName} />}
-                  <span className="deck-card-qty">{card.quantity}x</span>
-                  <span className="deck-card-name">{card.cardName}</span>
-                  {card.imageUri && (
-                    <div className="card-hover-preview">
-                      <img src={card.imageUri} alt={card.cardName} />
-                    </div>
-                  )}
-                </div>
+                <DeckCardRow key={i} quantity={card.quantity} name={card.cardName} imageUri={card.imageUri} />
               ))}
             </div>
           </div>
         </div>
       ))}
+
+      {importedDeck && (
+        <div className="deck-result imported-deck">
+          <div className="deck-header">
+            <h2>Imported: {importedDeck.playerName}'s deck</h2>
+            <button type="button" className="btn btn-secondary" onClick={() => setImportedDeck(null)}>
+              Clear
+            </button>
+          </div>
+          <p className="deck-builder-subtitle imported-deck-meta">
+            {importedDeck.tournamentName} ·{' '}
+            {new Date(importedDeck.tournamentDate).toLocaleDateString()} · {importedDeck.wins}-
+            {importedDeck.losses}
+            {importedDeck.draws > 0 ? `-${importedDeck.draws}` : ''}
+          </p>
+
+          <div className="deck-list">
+            <h3>Mainboard</h3>
+            <div className="deck-cards">
+              {importedDeck.mainboard.map((card: any, i: number) => (
+                <DeckCardRow key={i} quantity={card.count} name={card.name} imageUri={card.imageUri} />
+              ))}
+            </div>
+            {importedDeck.sideboard.length > 0 && (
+              <>
+                <h3>Sideboard</h3>
+                <div className="deck-cards">
+                  {importedDeck.sideboard.map((card: any, i: number) => (
+                    <DeckCardRow key={i} quantity={card.count} name={card.name} imageUri={card.imageUri} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

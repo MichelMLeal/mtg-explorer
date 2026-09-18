@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MTG_COLORS, FORMATS, DECK_STYLES } from '../types/index.js';
+import { MTG_COLORS, FORMATS, DECK_STYLES, CATALOG_NAMES } from '../types/index.js';
 import { TOPDECK_FORMATS } from '../constants.js';
 
 // ── Card Search ─────────────────────────────────────────────
@@ -24,6 +24,10 @@ export const CardNameSchema = z.object({
 
 export const ArenaIdSchema = z.object({
   arenaId: z.coerce.number().int().positive(),
+});
+
+export const AutocompleteQuerySchema = z.object({
+  q: z.string().min(1).max(200),
 });
 
 // ── Set ─────────────────────────────────────────────────────
@@ -53,6 +57,11 @@ export const DeckValidateSchema = z.object({
 // ── Top Decks ───────────────────────────────────────────────
 export const TopDecksQuerySchema = z.object({
   format: z.enum(Object.keys(TOPDECK_FORMATS) as [string, ...string[]]),
+});
+
+// ── Catalog ─────────────────────────────────────────────────
+export const CatalogParamsSchema = z.object({
+  name: z.enum(CATALOG_NAMES),
 });
 
 // ── Pagination ──────────────────────────────────────────────

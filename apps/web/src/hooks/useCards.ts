@@ -1,5 +1,18 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { searchCards, getCardById, getCardPrints, getSets, getFormats, getTopDecks, buildDeck, getRandomCard } from '../services/api';
+import {
+  searchCards,
+  getCardById,
+  getCardPrints,
+  getCardRulings,
+  getAutocomplete,
+  getSets,
+  getFormats,
+  getSymbology,
+  getCatalog,
+  getTopDecks,
+  buildDeck,
+  getRandomCard,
+} from '../services/api';
 
 export function useCardSearch(query: string, page = 1, order?: string, dir?: string) {
   return useQuery({
@@ -22,6 +35,39 @@ export function useCardPrints(id: string) {
     queryKey: ['card', id, 'prints'],
     queryFn: () => getCardPrints(id),
     enabled: !!id,
+  });
+}
+
+export function useCardRulings(id: string) {
+  return useQuery({
+    queryKey: ['card', id, 'rulings'],
+    queryFn: () => getCardRulings(id),
+    enabled: !!id,
+  });
+}
+
+export function useAutocomplete(query: string) {
+  return useQuery({
+    queryKey: ['cards', 'autocomplete', query],
+    queryFn: () => getAutocomplete(query),
+    enabled: query.trim().length > 1,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useSymbology() {
+  return useQuery({
+    queryKey: ['symbology'],
+    queryFn: getSymbology,
+    staleTime: Infinity,
+  });
+}
+
+export function useCatalog(name: string) {
+  return useQuery({
+    queryKey: ['catalog', name],
+    queryFn: () => getCatalog(name),
+    staleTime: Infinity,
   });
 }
 

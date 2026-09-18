@@ -1,5 +1,11 @@
 import type { FastifyInstance } from 'fastify';
-import { CardSearchSchema, CardParamsSchema, CardNameSchema, ArenaIdSchema } from '@mtg-explorer/shared';
+import {
+  CardSearchSchema,
+  CardParamsSchema,
+  CardNameSchema,
+  ArenaIdSchema,
+  AutocompleteQuerySchema,
+} from '@mtg-explorer/shared';
 import * as scryfall from '../../integrations/scryfall/index.js';
 import { ZodError } from 'zod';
 
@@ -22,6 +28,15 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
     const { q, page, perPage, order, dir } = parsed.data;
     const result = await scryfall.searchCards(q, page, perPage, order, dir);
     return reply.send(result);
+  });
+
+  // ── GET /api/cards/autocomplete — Name suggestions ───────
+  app.get('/api/cards/autocomplete', async (request, reply) => {
+    const parsed = AutocompleteQuerySchema.safeParse(request.query);
+    if (!parsed.success) return reply.status(400).send(formatZodError(parsed.error));
+
+    const suggestions = await scryfall.getAutocomplete(parsed.data.q);
+    return reply.send({ data: suggestions });
   });
 
   // ── GET /api/cards/random — Random card ─────────────────
@@ -70,5 +85,14 @@ export async function cardRoutes(app: FastifyInstance): Promise<void> {
 
     const prints = await scryfall.getCardPrints(card.oracleId);
     return reply.send({ data: prints });
+  });
+
+  // ── GET /api/cards/:id/rulings — Official rulings ────────
+  app.get('/api/cards/:id/rulings', async (request, reply) => {
+    const parsed = CardParamsSchema.safeParse(request.params);
+    if (!parsed.success) return reply.status(400).send(formatZodError(parsed.error));
+
+    const rulings = await scryfall.getCardRulings(parsed.data.id);
+    return reply.send({ data: rulings });
   });
 }

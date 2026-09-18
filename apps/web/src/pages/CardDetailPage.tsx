@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCard, useCardPrints } from '../hooks/useCards';
+import { useCard, useCardPrints, useCardRulings } from '../hooks/useCards';
 import type { LegalityStatus } from '../lib/types';
 import LoadingImage from '../components/LoadingImage';
+import ManaCost from '../components/ManaCost';
 
 const FORMAT_LABELS: Record<string, string> = {
   standard: 'Standard',
@@ -30,6 +31,8 @@ export default function CardDetailPage() {
   const card = data?.data;
   const { data: printsData } = useCardPrints(id || '');
   const prints = printsData?.data || [];
+  const { data: rulingsData } = useCardRulings(id || '');
+  const rulings = rulingsData?.data || [];
 
   if (isLoading) {
     return (
@@ -74,7 +77,9 @@ export default function CardDetailPage() {
 
         <div className="card-detail-info">
           <h1 className="card-detail-name">{card.name}</h1>
-          <div className="card-detail-mana">{card.manaCost}</div>
+          <div className="card-detail-mana">
+            <ManaCost cost={card.manaCost} />
+          </div>
           <div className="card-detail-type">{card.typeLine}</div>
 
           <div className="card-detail-text">{card.oracleText}</div>
@@ -173,6 +178,20 @@ export default function CardDetailPage() {
                 )}
                 <span className="print-set">{print.setCode.toUpperCase()}</span>
               </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {rulings.length > 0 && (
+        <div className="card-rulings">
+          <h3>Rulings ({rulings.length})</h3>
+          <div className="rulings-list">
+            {rulings.map((ruling: any, i: number) => (
+              <div key={i} className="ruling-item">
+                <span className="ruling-date">{ruling.publishedAt}</span>
+                <p className="ruling-comment">{ruling.comment}</p>
+              </div>
             ))}
           </div>
         </div>

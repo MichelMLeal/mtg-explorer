@@ -13,6 +13,7 @@ import { setRoutes } from './modules/sets/routes.js';
 import { formatRoutes } from './modules/formats/routes.js';
 import { deckRoutes } from './modules/decks/routes.js';
 import { metaRoutes } from './modules/meta/routes.js';
+import { referenceRoutes } from './modules/reference/routes.js';
 import { closeRedis } from './infrastructure/cache/index.js';
 import { createScopedLogger } from './infrastructure/logging/index.js';
 
@@ -49,6 +50,7 @@ async function main() {
   await app.register(formatRoutes);
   await app.register(deckRoutes);
   await app.register(metaRoutes);
+  await app.register(referenceRoutes);
 
   // ── Start ────────────────────────────────────────────────
   try {

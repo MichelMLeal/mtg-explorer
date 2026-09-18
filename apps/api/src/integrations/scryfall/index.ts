@@ -1,4 +1,4 @@
-import type { MtgCard, MtgSet, MtgColor, MtgFormat, MtgRarity } from '@mtg-explorer/shared';
+import type { MtgCard, MtgSet, MtgColor, MtgFormat, MtgRarity, Ruling, ManaSymbol } from '@mtg-explorer/shared';
 import { scryfallGet, scryfallPost } from '../../infrastructure/http/index.js';
 import { cacheGet, cacheSet } from '../../infrastructure/cache/index.js';
 import { CACHE_KEYS, CACHE_TTL } from '@mtg-explorer/shared';
@@ -327,4 +327,70 @@ export async function getCardImagesByNames(names: string[]): Promise<Map<string,
   }
 
   return images;
+}
+
+export async function getAutocomplete(query: string): Promise<string[]> {
+  const cacheKey = CACHE_KEYS.CARD_AUTOCOMPLETE(query);
+  const cached = await cacheGet<string[]>(cacheKey);
+  if (cached) return cached;
+
+  const result = await scryfallGet<{ data: string[] }>(
+    `/cards/autocomplete?q=${encodeURIComponent(query)}`,
+  );
+  await cacheSet(cacheKey, result.data, CACHE_TTL.CARD_AUTOCOMPLETE);
+  return result.data;
+}
+
+export async function getCardRulings(id: string): Promise<Ruling[]> {
+  const cacheKey = CACHE_KEYS.CARD_RULINGS(id);
+  const cached = await cacheGet<Ruling[]>(cacheKey);
+  if (cached) return cached;
+
+  interface ScryfallRuling {
+    source: string;
+    published_at: string;
+    comment: string;
+  }
+
+  let result: ScryfallListResponse<ScryfallRuling>;
+  try {
+    result = await scryfallGet<ScryfallListResponse<ScryfallRuling>>(`/cards/${id}/rulings`);
+  } catch (err: any) {
+    if (err.status === 404) return [];
+    throw err;
+  }
+
+  const rulings = result.data.map((r) => ({
+    source: r.source,
+    publishedAt: r.published_at,
+    comment: r.comment,
+  }));
+  await cacheSet(cacheKey, rulings, CACHE_TTL.CARD_RULINGS);
+  return rulings;
+}
+
+export async function getSymbology(): Promise<ManaSymbol[]> {
+  const cached = await cacheGet<ManaSymbol[]>(CACHE_KEYS.SYMBOLOGY);
+  if (cached) return cached;
+
+  interface ScryfallSymbol {
+    symbol: string;
+    svg_uri: string;
+    english: string;
+  }
+
+  const result = await scryfallGet<{ data: ScryfallSymbol[] }>('/symbology');
+  const symbols = result.data.map((s) => ({ symbol: s.symbol, svgUri: s.svg_uri, english: s.english }));
+  await cacheSet(CACHE_KEYS.SYMBOLOGY, symbols, CACHE_TTL.SYMBOLOGY);
+  return symbols;
+}
+
+export async function getCatalog(name: string): Promise<string[]> {
+  const cacheKey = CACHE_KEYS.CATALOG(name);
+  const cached = await cacheGet<string[]>(cacheKey);
+  if (cached) return cached;
+
+  const result = await scryfallGet<{ data: string[] }>(`/catalog/${name}`);
+  await cacheSet(cacheKey, result.data, CACHE_TTL.CATALOG);
+  return result.data;
 }

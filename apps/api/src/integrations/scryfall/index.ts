@@ -131,6 +131,17 @@ function mapSet(s: ScryfallSet): MtgSet {
 
 // ── Public API ──────────────────────────────────────────────
 
+// Our API's `order` values are named for what a frontend dropdown would
+// call them; Scryfall's actual sort keys differ for a couple of these
+// ('price' -> 'usd', 'edhrec_rank' -> 'edhrec'). Scryfall silently ignores
+// an order key it doesn't recognize (falls back to its default) instead of
+// erroring, so a mismatch here doesn't fail loudly - it just quietly stops
+// sorting, which is exactly what happened before this map existed.
+const SCRYFALL_ORDER_KEYS: Record<string, string> = {
+  price: 'usd',
+  edhrec_rank: 'edhrec',
+};
+
 export async function searchCards(
   query: string,
   page = 1,
@@ -151,7 +162,7 @@ export async function searchCards(
     per_page: String(perPage),
     format: 'json',
   });
-  if (order) params.set('order', order);
+  if (order) params.set('order', SCRYFALL_ORDER_KEYS[order] ?? order);
   if (dir) params.set('dir', dir);
 
   let result: ScryfallListResponse<ScryfallCard>;

@@ -40,6 +40,16 @@ export default function CardGrid({ cards, onCardClick }: CardGridProps) {
               <div className="card-price">${card.prices.usd}</div>
             )}
           </div>
+
+          {card.imageUris?.large && (
+            <div className="card-hover-preview">
+              <img src={card.imageUris.large} alt={card.name} />
+              <div className="card-hover-meta">
+                <span>{card.rarity}</span>
+                {card.prices?.usd && <span>${card.prices.usd}</span>}
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>

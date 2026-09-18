@@ -12,6 +12,9 @@ const envSchema = z.object({
   SCRYFALL_API_BASE: z.string().url().default('https://api.scryfall.com'),
   SCRYFALL_RATE_LIMIT: z.coerce.number().int().positive().default(10),
 
+  // TopDeck.gg (Top Decks feature) - optional, feature is disabled without it
+  TOPDECK_API_KEY: z.string().optional(),
+
   // Rate Limiting
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),

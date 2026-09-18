@@ -437,6 +437,44 @@ a:hover { color: var(--accent-hover); }
   margin-top: var(--space-md);
 }
 
+/* ── Top Decks ────────────────────────────────────────────── */
+.top-decks-format { max-width: 240px; margin: 0 auto var(--space-xl); }
+
+.top-decks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  text-align: left;
+}
+
+.top-deck-item {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.top-deck-summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  list-style: none;
+}
+.top-deck-summary::-webkit-details-marker { display: none; }
+
+.top-deck-rank {
+  color: var(--accent);
+  font-weight: 700;
+  min-width: 2.5em;
+}
+.top-deck-player { font-weight: 600; }
+.top-deck-record { color: var(--success); font-weight: 600; }
+.top-deck-tournament { color: var(--text-secondary); font-size: 0.85rem; margin-left: auto; }
+
+.top-deck-item .deck-list { margin-top: var(--space-lg); }
+
 /* ── Deck Result ──────────────────────────────────────────── */
 .deck-result {
   text-align: left;

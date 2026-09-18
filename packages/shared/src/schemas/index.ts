@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MTG_COLORS, FORMATS, DECK_STYLES } from '../types/index.js';
+import { TOPDECK_FORMATS } from '../constants.js';
 
 // ── Card Search ─────────────────────────────────────────────
 export const CardSearchSchema = z.object({
@@ -47,6 +48,11 @@ export type DeckBuildParams = z.infer<typeof DeckBuildSchema>;
 export const DeckValidateSchema = z.object({
   format: z.enum(FORMATS),
   cards: z.array(z.string().min(1).max(200)).min(1).max(100),
+});
+
+// ── Top Decks ───────────────────────────────────────────────
+export const TopDecksQuerySchema = z.object({
+  format: z.enum(Object.keys(TOPDECK_FORMATS) as [string, ...string[]]),
 });
 
 // ── Pagination ──────────────────────────────────────────────

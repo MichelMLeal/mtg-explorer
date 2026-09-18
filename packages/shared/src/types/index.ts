@@ -146,6 +146,23 @@ export interface DeckBuildRequest {
   strategy?: string;
 }
 
+// ── Top Decks (TopDeck.gg tournament results) ────────────────
+export interface DeckCardEntry {
+  name: string;
+  count: number;
+}
+
+export interface TopDeckEntry {
+  playerName: string;
+  tournamentName: string;
+  tournamentDate: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  mainboard: DeckCardEntry[];
+  sideboard: DeckCardEntry[];
+}
+
 // ── API Pagination ──────────────────────────────────────────
 export interface PaginatedResponse<T> {
   data: T[];

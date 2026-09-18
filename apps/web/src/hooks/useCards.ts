@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { searchCards, getCardById, getCardPrints, getSets, getFormats, buildDeck, getRandomCard } from '../services/api';
+import { searchCards, getCardById, getCardPrints, getSets, getFormats, getTopDecks, buildDeck, getRandomCard } from '../services/api';
 
 export function useCardSearch(query: string, page = 1, order?: string, dir?: string) {
   return useQuery({
@@ -43,6 +43,15 @@ export function useFormats() {
   return useQuery({
     queryKey: ['formats'],
     queryFn: getFormats,
+  });
+}
+
+export function useTopDecks(format: string) {
+  return useQuery({
+    queryKey: ['meta', 'top-decks', format],
+    queryFn: () => getTopDecks(format),
+    enabled: !!format,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

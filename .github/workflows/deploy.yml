@@ -110,6 +110,7 @@ jobs:
         env:
           RELEASE_SHA: ${{ steps.vars.outputs.sha }}
           OWNER_LC: ${{ steps.vars.outputs.owner_lc }}
+          TOPDECK_API_KEY: ${{ secrets.TOPDECK_API_KEY }}
         run: |
           echo "PWD: $(pwd)"
           echo "Workspace files: $(ls -a)"

@@ -59,6 +59,11 @@ export async function getFormats() {
   return apiFetch<{ data: any[] }>('/api/formats');
 }
 
+// ── Top Decks ──────────────────────────────────────────────
+export async function getTopDecks(format: string) {
+  return apiFetch<{ data: any[] }>(`/api/meta/top-decks?format=${format}`);
+}
+
 // ── Deck Builder ───────────────────────────────────────────
 export async function buildDeck(params: {
   colors: string[];

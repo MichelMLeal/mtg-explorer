@@ -82,6 +82,22 @@ export interface ManaCurve {
   '6+': number;
 }
 
+export interface DeckCardEntry {
+  name: string;
+  count: number;
+}
+
+export interface TopDeckEntry {
+  playerName: string;
+  tournamentName: string;
+  tournamentDate: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  mainboard: DeckCardEntry[];
+  sideboard: DeckCardEntry[];
+}
+
 export type MtgColor = 'W' | 'U' | 'B' | 'R' | 'G';
 export type MtgFormat = 'standard' | 'pioneer' | 'modern' | 'legacy' | 'vintage' | 'commander' | 'pauper' | 'historic' | 'alchemy' | 'brawl';
 export type MtgRarity = 'common' | 'uncommon' | 'rare' | 'mythic';

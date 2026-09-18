@@ -8,6 +8,8 @@ export type {
   ManaCurve,
   DeckBuildRequest,
   PaginatedResponse,
+  TopDeckEntry,
+  DeckCardEntry,
   MtgColor,
   MtgFormat,
   MtgRarity,
@@ -34,6 +36,7 @@ export {
   DeckBuildSchema,
   DeckValidateSchema,
   PaginationSchema,
+  TopDecksQuerySchema,
 } from './schemas/index.js';
 
 export type {
@@ -48,4 +51,5 @@ export {
   RATE_LIMITS,
   DECK_RULES,
   MANA_CURVE_TARGETS,
+  TOPDECK_FORMATS,
 } from './constants.js';

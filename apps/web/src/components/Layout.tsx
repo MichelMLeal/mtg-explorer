@@ -4,6 +4,7 @@ const NAV_ITEMS = [
   { path: '/', label: 'Search', icon: '🔍' },
   { path: '/sets', label: 'Sets', icon: '📦' },
   { path: '/deck-builder', label: 'Deck Builder', icon: '⚔️' },
+  { path: '/top-decks', label: 'Top Decks', icon: '🏆' },
 ];
 
 export default function Layout() {

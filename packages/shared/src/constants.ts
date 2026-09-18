@@ -16,6 +16,7 @@ export const CACHE_KEYS = {
   RANDOM_CARD: (seed: string) => `mtg:card:random:${seed}`,
   DECK_BUILD: (hash: string) => `mtg:deck:${hash}`,
   FORMATS: 'mtg:formats',
+  TOP_DECKS: (format: string) => `mtg:topdecks:${format}`,
 } as const;
 
 // ── Cache TTLs (seconds) ────────────────────────────────────
@@ -28,6 +29,7 @@ export const CACHE_TTL = {
   RANDOM_CARD: 60, // 1 min
   DECK_BUILD: 1800, // 30 min
   FORMATS: 86400, // 24 hours
+  TOP_DECKS: 21600, // 6 hours - tournament results don't change that fast
 } as const;
 
 // ── Rate Limiting ───────────────────────────────────────────
@@ -52,6 +54,21 @@ export const DECK_RULES: Record<string, { min: number; max: number; sideboard: n
   brawl: { min: 60, max: 60, sideboard: 0 },
   gladiator: { min: 60, max: 60, sideboard: 15 },
   future: { min: 60, max: 60, sideboard: 15 },
+};
+
+// ── TopDeck.gg format mapping ────────────────────────────────
+// TopDeck.gg only has organized-paper-tournament data, so only these of our
+// FORMATS have a match on their side (Arena-only formats like Alchemy/Brawl
+// have no paper tournaments to report). Values are TopDeck's own format
+// strings, confirmed live against their API.
+export const TOPDECK_FORMATS: Record<string, string> = {
+  standard: 'Standard',
+  modern: 'Modern',
+  pioneer: 'Pioneer',
+  legacy: 'Legacy',
+  vintage: 'Vintage',
+  pauper: 'Pauper',
+  commander: 'EDH',
 };
 
 // ── Mana Curve Targets ──────────────────────────────────────

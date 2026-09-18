@@ -1,16 +1,17 @@
-{
-  apps:
-    mtg.tail800040.ts.net {
-      reverse_proxy /api/* 127.0.0.1:3010
-      reverse_proxy /* 127.0.0.1:3001
+# The lab box serves multiple apps off one shared Tailscale hostname
+# (e.g. lab-notebook.tail800040.ts.net) with path-prefix routing, the same
+# way the sibling pokemon-explorer app is wired up. This is NOT a standalone
+# Caddyfile — merge this block into the shared /etc/caddy/Caddyfile on the
+# lab box, before its catch-all `handle { ... }` block.
+handle /mtg/api/* {
+  uri strip_prefix /mtg
+  reverse_proxy 127.0.0.1:3010
+}
 
-      header {
-        X-Content-Type-Options nosniff
-        X-Frame-Options DENY
-        X-XSS-Protection "1; mode=block"
-        Referrer-Policy strict-origin-when-cross-origin
-      }
+handle /mtg {
+  redir /mtg/ 308
+}
 
-      encode gzip
-    }
+handle_path /mtg/* {
+  reverse_proxy 127.0.0.1:3001
 }

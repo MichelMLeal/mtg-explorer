@@ -75,6 +75,9 @@ jobs:
           tags: |
             ${{ env.WEB_IMAGE }}:${{ steps.meta.outputs.sha }}
             ${{ env.WEB_IMAGE }}:latest
+          build-args: |
+            VITE_BASE=/mtg/
+            VITE_API_URL=/mtg
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

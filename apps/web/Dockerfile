@@ -14,6 +14,13 @@ COPY packages/shared/ packages/shared/
 COPY apps/web/ apps/web/
 
 RUN pnpm --filter @mtg-explorer/shared build
+
+# Path prefix the app is served under behind the shared lab Caddy proxy
+# (e.g. /mtg/), and the matching API base the built JS should call.
+ARG VITE_BASE=/
+ARG VITE_API_URL=
+ENV VITE_BASE=$VITE_BASE
+ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm --filter @mtg-explorer/web build
 
 # ── Production Stage ──────────────────────────────────────

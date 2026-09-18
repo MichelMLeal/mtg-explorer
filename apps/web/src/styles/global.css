@@ -550,7 +550,10 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius-sm);
   object-fit: cover;
   flex-shrink: 0;
+  background: var(--bg-secondary);
+  animation: pulse 1.5s infinite;
 }
+.deck-card-thumb.thumb-loaded { animation: none; }
 
 /* ── Card Prints ──────────────────────────────────────────── */
 .card-prints { margin-top: var(--space-2xl); text-align: left; }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { MtgColor, MtgFormat, DeckStyle } from '../lib/types';
 import ManaFilter from '../components/ManaFilter';
+import CardThumb from '../components/CardThumb';
 import { useBuildDeck } from '../hooks/useCards';
 
 const FORMATS: MtgFormat[] = [
@@ -149,9 +150,7 @@ export default function DeckBuilderPage() {
             <div className="deck-cards">
               {deck.cards.map((card: any, i: number) => (
                 <div key={i} className="deck-card-item">
-                  {card.imageUri ? (
-                    <img src={card.imageUri} alt={card.cardName} className="deck-card-thumb" loading="lazy" />
-                  ) : null}
+                  {card.imageUri && <CardThumb src={card.imageUri} alt={card.cardName} />}
                   <span className="deck-card-qty">{card.quantity}x</span>
                   <span className="deck-card-name">{card.cardName}</span>
                   {card.imageUri && (

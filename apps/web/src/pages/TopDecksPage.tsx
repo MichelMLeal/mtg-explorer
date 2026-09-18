@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { MtgFormat } from '../lib/types';
 import { useTopDecks } from '../hooks/useCards';
+import CardThumb from '../components/CardThumb';
 
 // Only formats TopDeck.gg actually has paper-tournament data for.
 const FORMATS: MtgFormat[] = ['standard', 'pioneer', 'modern', 'legacy', 'vintage', 'commander', 'pauper'];
@@ -12,9 +13,7 @@ function formatRecord(wins: number, losses: number, draws: number): string {
 function DeckCardRow({ card }: { card: { name: string; count: number; imageUri?: string } }) {
   return (
     <div className="deck-card-item">
-      {card.imageUri && (
-        <img src={card.imageUri} alt={card.name} className="deck-card-thumb" loading="lazy" />
-      )}
+      {card.imageUri && <CardThumb src={card.imageUri} alt={card.name} />}
       <span className="deck-card-qty">{card.count}x</span>
       <span className="deck-card-name">{card.name}</span>
       {card.imageUri && (
